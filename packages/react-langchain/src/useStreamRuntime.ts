@@ -66,7 +66,8 @@ const getMessageContent = (msg: AppendMessage) => {
   ];
 
   const hasNonText = allContent.some(
-    (part) => part.type === "file" || part.type === "image",
+    (part) =>
+      part.type === "file" || part.type === "image" || part.type === "video",
   );
   const hasText = allContent.some((part) => part.type === "text");
   if (hasNonText && !hasText) {
@@ -80,6 +81,16 @@ const getMessageContent = (msg: AppendMessage) => {
         return { type: "text" as const, text: part.text };
       case "image":
         return { type: "image_url" as const, image_url: { url: part.image } };
+      case "video":
+        return {
+          type: "video" as const,
+          source_type: "url" as const,
+          url: part.url,
+          ...(part.mimeType != null && { mime_type: part.mimeType }),
+          ...(part.filename != null && {
+            metadata: { filename: part.filename },
+          }),
+        };
       case "file":
         return {
           type: "file" as const,

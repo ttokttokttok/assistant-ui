@@ -10,6 +10,7 @@ import type {
   DataMessagePart,
   SourceMessagePart,
   FileMessagePart,
+  VideoMessagePart,
   ThreadMessageLike,
 } from "@assistant-ui/core";
 import type { ReadonlyJSONObject } from "assistant-stream/utils";
@@ -203,6 +204,15 @@ function convertParts(
       }
 
       if (part.type === "file") {
+        if (part.mediaType.startsWith("video/")) {
+          return {
+            type: "video",
+            url: part.url,
+            mimeType: part.mediaType,
+            ...(part.filename != null && { filename: part.filename }),
+          } satisfies VideoMessagePart;
+        }
+
         return {
           type: "file",
           data: part.url,
@@ -257,7 +267,11 @@ export const AISDKMessageConverter = unstable_createMessageConverter(
             ?.filter((p) => p.type === "file")
             .map((part, idx) => ({
               id: idx.toString(),
-              type: part.mediaType.startsWith("image/") ? "image" : "file",
+              type: part.mediaType.startsWith("image/")
+                ? "image"
+                : part.mediaType.startsWith("video/")
+                  ? "video"
+                  : "file",
               name: part.filename ?? "file",
               content: [
                 part.mediaType.startsWith("image/")
@@ -266,12 +280,21 @@ export const AISDKMessageConverter = unstable_createMessageConverter(
                       image: part.url,
                       filename: part.filename!,
                     }
-                  : {
-                      type: "file",
-                      filename: part.filename!,
-                      data: part.url,
-                      mimeType: part.mediaType,
-                    },
+                  : part.mediaType.startsWith("video/")
+                    ? {
+                        type: "video",
+                        url: part.url,
+                        mimeType: part.mediaType,
+                        ...(part.filename != null && {
+                          filename: part.filename,
+                        }),
+                      }
+                    : {
+                        type: "file",
+                        filename: part.filename!,
+                        data: part.url,
+                        mimeType: part.mediaType,
+                      },
               ],
               contentType: part.mediaType ?? "unknown/unknown",
               status: { type: "complete" as const },
