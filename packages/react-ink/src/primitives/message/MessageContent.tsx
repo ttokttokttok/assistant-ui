@@ -28,6 +28,10 @@ export type MessageContentProps = {
     part: Extract<MessageContentPart, { type: "image" }>;
     index: number;
   }) => ReactElement;
+  renderVideo?: (props: {
+    part: Extract<MessageContentPart, { type: "video" }>;
+    index: number;
+  }) => ReactElement;
   renderReasoning?: (props: {
     part: Extract<MessageContentPart, { type: "reasoning" }>;
     index: number;
@@ -120,6 +124,7 @@ export const MessageContent = ({
   renderText,
   renderToolCall,
   renderImage,
+  renderVideo,
   renderReasoning,
   renderSource,
   renderFile,
@@ -156,6 +161,11 @@ export const MessageContent = ({
             if (!renderImage) return null;
             return (
               <Fragment key={key}>{renderImage({ part, index })}</Fragment>
+            );
+          case "video":
+            if (!renderVideo) return null;
+            return (
+              <Fragment key={key}>{renderVideo({ part, index })}</Fragment>
             );
           case "reasoning":
             if (!renderReasoning) return null;
