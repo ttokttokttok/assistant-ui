@@ -77,11 +77,33 @@ type SelectedTemplateRequestContext = {
   docsUrl?: unknown;
 };
 
+type EvalToolManifestEntry = {
+  name: string;
+  description?: string;
+};
+
 async function prepareMessages(messages: readonly UIMessage[]) {
   const modelMessages = await convertToModelMessages(
     injectQuoteContext([...messages]),
   );
   return pruneMessages({ messages: modelMessages, ...PRUNE_OPTIONS });
+}
+
+function summarizeToolsForEval(
+  tools: Record<string, unknown> | undefined,
+): EvalToolManifestEntry[] | undefined {
+  if (process.env.XULUX_EVAL_MODE !== "1") return undefined;
+
+  return Object.entries(tools ?? {}).map(([name, tool]) => {
+    const record =
+      tool && typeof tool === "object" ? (tool as Record<string, unknown>) : {};
+    return {
+      name,
+      ...(typeof record.description === "string"
+        ? { description: record.description }
+        : undefined),
+    };
+  });
 }
 
 function formatSelectedTemplateContext(
@@ -240,7 +262,7 @@ export async function POST(req: Request): Promise<Response> {
     const body = await req.json();
     const {
       messages,
-      tools,
+      tools: clientTools,
       system: pageContext,
       config,
       sessionId,
@@ -276,6 +298,12 @@ export async function POST(req: Request): Promise<Response> {
     const baseModel = modelConfig.model;
     const distinctId = getDistinctId(req);
     const prismTracer = createPrismTracer({ evalRunId, localTraceUrl });
+    const xuluxTools = createXuluxChatTools({
+      clientTools,
+      sessionId,
+      routeUrl: req.url,
+    });
+    const toolManifest = summarizeToolsForEval(xuluxTools);
 
     const posthogModel = posthogServer
       ? withTracing(baseModel, posthogServer, {
@@ -296,6 +324,7 @@ export async function POST(req: Request): Promise<Response> {
             evalRunId,
             sessionId,
             source: "xulux_chat",
+            ...(toolManifest ? { toolManifest } : undefined),
           },
         })
       : null;
@@ -309,11 +338,7 @@ export async function POST(req: Request): Promise<Response> {
       messages: prunedMessages,
       maxOutputTokens: 8192,
       stopWhen: stepCountIs(25),
-      tools: createXuluxChatTools({
-        clientTools: tools,
-        sessionId,
-        routeUrl: req.url,
-      }),
+      tools: xuluxTools,
       onFinish: async () => {
         await prism?.end();
       },
