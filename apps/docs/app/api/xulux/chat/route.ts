@@ -77,33 +77,11 @@ type SelectedTemplateRequestContext = {
   docsUrl?: unknown;
 };
 
-type EvalToolManifestEntry = {
-  name: string;
-  description?: string;
-};
-
 async function prepareMessages(messages: readonly UIMessage[]) {
   const modelMessages = await convertToModelMessages(
     injectQuoteContext([...messages]),
   );
   return pruneMessages({ messages: modelMessages, ...PRUNE_OPTIONS });
-}
-
-function summarizeToolsForEval(
-  tools: Record<string, unknown> | undefined,
-): EvalToolManifestEntry[] | undefined {
-  if (process.env.XULUX_EVAL_MODE !== "1") return undefined;
-
-  return Object.entries(tools ?? {}).map(([name, tool]) => {
-    const record =
-      tool && typeof tool === "object" ? (tool as Record<string, unknown>) : {};
-    return {
-      name,
-      ...(typeof record.description === "string"
-        ? { description: record.description }
-        : undefined),
-    };
-  });
 }
 
 function formatSelectedTemplateContext(
@@ -303,7 +281,22 @@ export async function POST(req: Request): Promise<Response> {
       sessionId,
       routeUrl: req.url,
     });
-    const toolManifest = summarizeToolsForEval(xuluxTools);
+    const toolManifest =
+      process.env.XULUX_EVAL_MODE === "1"
+        ? Object.entries(xuluxTools).map(([name, tool]) => {
+            const { description, inputSchema } = tool as {
+              description?: unknown;
+              inputSchema?: { jsonSchema?: unknown };
+            };
+            return {
+              name,
+              ...(typeof description === "string" ? { description } : {}),
+              ...(inputSchema?.jsonSchema
+                ? { inputSchema: inputSchema.jsonSchema }
+                : {}),
+            };
+          })
+        : undefined;
 
     const posthogModel = posthogServer
       ? withTracing(baseModel, posthogServer, {
