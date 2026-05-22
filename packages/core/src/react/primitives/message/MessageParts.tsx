@@ -30,8 +30,14 @@ import type {
   ReasoningMessagePartComponent,
   ReasoningGroupComponent,
   QuoteMessagePartComponent,
+  GenerativeUIComponentRegistry,
 } from "../../types/MessagePartComponentTypes";
-import { isMcpAppUri, type MessagePartStatus } from "../../../types/message";
+import { GenerativeUIRender } from "../generativeUI/GenerativeUI";
+import {
+  isMcpAppUri,
+  type MessagePartStatus,
+  type GenerativeUIMessagePart,
+} from "../../../types/message";
 import type { DataRenderersState } from "../../types/scopes/dataRenderers";
 import type { ToolsState } from "../../types/scopes/tools";
 import { useShallow } from "zustand/shallow";
@@ -174,6 +180,24 @@ export namespace MessagePrimitiveParts {
     data?: DataConfig | undefined;
     /** Component for rendering a quoted message reference (from metadata, not parts) */
     Quote?: QuoteMessagePartComponent | undefined;
+    /**
+     * Configuration for generative-ui part rendering.
+     *
+     * `components` is the consumer-provided allowlist of React components
+     * the agent's JSON spec is permitted to render. Any name not present in
+     * the registry is rejected with a typed `GenerativeUIRenderError` —
+     * this is the security boundary in the same-realm rendering path.
+     */
+    generativeUI?:
+      | {
+          /** The component allowlist (the security boundary). */
+          components: GenerativeUIComponentRegistry;
+          /** Optional fallback for unknown component names. */
+          Fallback?:
+            | ComponentType<{ component: string; props?: unknown }>
+            | undefined;
+        }
+      | undefined;
   };
 
   type ToolsConfig =
@@ -345,6 +369,7 @@ export const MessagePartComponent: FC<MessagePartComponentProps> = ({
     Unstable_Audio: Audio = defaultComponents.Unstable_Audio,
     tools = {},
     data,
+    generativeUI,
   } = {},
 }) => {
   const aui = useAui();
@@ -394,6 +419,29 @@ export const MessagePartComponent: FC<MessagePartComponentProps> = ({
       return <DataUIDisplay {...part} Fallback={Data} />;
     }
 
+    case "generative-ui": {
+      if (!generativeUI?.components) {
+        if (
+          typeof process !== "undefined" &&
+          process.env?.NODE_ENV !== "production"
+        ) {
+          console.warn(
+            "MessagePrimitive.Parts received a generative-ui part but no " +
+              "`components.generativeUI.components` allowlist was provided. " +
+              "Pass an allowlist or render with <MessagePrimitive.GenerativeUI />.",
+          );
+        }
+        return null;
+      }
+      return (
+        <GenerativeUIRender
+          spec={(part as GenerativeUIMessagePart).spec}
+          components={generativeUI.components}
+          Fallback={generativeUI.Fallback}
+        />
+      );
+    }
+
     default:
       console.warn(`Unknown message part type: ${type}`);
       return null;
@@ -429,6 +477,7 @@ export const MessagePrimitivePartByIndex: FC<MessagePrimitivePartByIndex.Props> 
       prev.components?.Unstable_Audio === next.components?.Unstable_Audio &&
       prev.components?.tools === next.components?.tools &&
       prev.components?.data === next.components?.data &&
+      prev.components?.generativeUI === next.components?.generativeUI &&
       prev.components?.ToolGroup === next.components?.ToolGroup &&
       prev.components?.ReasoningGroup === next.components?.ReasoningGroup,
   );
