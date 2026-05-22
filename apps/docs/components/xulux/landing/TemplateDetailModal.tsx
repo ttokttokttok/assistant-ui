@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   Code2,
@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { XuluxTemplate } from "../templates/types";
+import { TemplateCard } from "./TemplateCard";
 import { Thumbnail } from "./Thumbnail";
 
 type Props = {
@@ -39,12 +40,9 @@ export function TemplateDetailModal({
     setIframeLoaded(false);
   }, [template]);
 
-  const others = allTemplates
-    .filter((candidate) => candidate.id !== current?.id)
-    .slice(0, 4);
-
-  const handleOther = (nextTemplate: XuluxTemplate) => {
-    setCurrent(nextTemplate);
+  const others = allTemplates.filter((c) => c.id !== current?.id).slice(0, 4);
+  const handleOther = (next: XuluxTemplate) => {
+    setCurrent(next);
     setIframeLoaded(false);
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -52,9 +50,7 @@ export function TemplateDetailModal({
   if (!current) return null;
 
   const hasPreview = Boolean(current.previewUrl);
-  const requiredEnv = current.env.filter((item) => item.required);
-  const startLabel =
-    current.kind === "template" ? "Start building" : "Use this example";
+  const requiredEnv = current.env.filter((e) => e.required);
   const previewLabel =
     current.previewStatus === "live"
       ? "Hosted preview"
@@ -145,13 +141,20 @@ export function TemplateDetailModal({
 
               <div className="mt-5 space-y-3 rounded-md border border-border bg-muted/25 p-3">
                 <div className="flex flex-wrap gap-1.5">
-                  <InfoPill>
-                    {current.kind === "template"
+                  {[
+                    current.kind === "template"
                       ? "Editable template"
-                      : "Reference example"}
-                  </InfoPill>
-                  <InfoPill>{previewLabel}</InfoPill>
-                  <InfoPill>{current.tech.framework}</InfoPill>
+                      : "Reference example",
+                    previewLabel,
+                    current.tech.framework,
+                  ].map((text) => (
+                    <span
+                      key={text}
+                      className="rounded-md bg-background px-2.5 py-1 font-medium text-[11px] text-muted-foreground"
+                    >
+                      {text}
+                    </span>
+                  ))}
                 </div>
                 <div className="flex items-start gap-2 text-muted-foreground text-xs">
                   <Code2 className="mt-0.5 size-3.5 shrink-0" />
@@ -160,7 +163,7 @@ export function TemplateDetailModal({
                     {current.tech.frontendPattern}
                   </span>
                 </div>
-                {requiredEnv.length > 0 ? (
+                {requiredEnv.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 font-medium text-foreground text-xs">
                       <KeyRound className="size-3.5" />
@@ -179,8 +182,8 @@ export function TemplateDetailModal({
                       ))}
                     </div>
                   </div>
-                ) : null}
-                {!current.canStart ? (
+                )}
+                {!current.canStart && (
                   <div className="flex items-start gap-2 text-amber-600 text-xs dark:text-amber-400">
                     <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
                     <span>
@@ -188,7 +191,7 @@ export function TemplateDetailModal({
                       yet.
                     </span>
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
 
@@ -198,7 +201,9 @@ export function TemplateDetailModal({
               disabled={!current.canStart}
               className="mt-6 w-full rounded-lg bg-foreground px-5 py-2.5 font-medium text-background text-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {startLabel}
+              {current.kind === "template"
+                ? "Start building"
+                : "Use this example"}
             </button>
           </div>
         </div>
@@ -213,37 +218,16 @@ export function TemplateDetailModal({
             </h3>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {others.map((other) => (
-                <button
+                <TemplateCard
                   key={other.id}
-                  type="button"
-                  onClick={() => handleOther(other)}
-                  className="flex flex-col gap-2 rounded-lg border border-border bg-card/40 p-2 text-left transition-colors hover:border-border/80 hover:bg-card/60"
-                >
-                  <Thumbnail
-                    gradient={other.gradient}
-                    src={other.screenshotUrl}
-                    label={other.title}
-                    className="aspect-video w-full"
-                  />
-                  <div className="px-1 pb-0.5">
-                    <div className="truncate font-medium text-xs">
-                      {other.title}
-                    </div>
-                  </div>
-                </button>
+                  template={other}
+                  onClick={handleOther}
+                />
               ))}
             </div>
           </div>
         )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-function InfoPill({ children }: { children: ReactNode }) {
-  return (
-    <span className="rounded-md bg-background px-2.5 py-1 font-medium text-[11px] text-muted-foreground">
-      {children}
-    </span>
   );
 }

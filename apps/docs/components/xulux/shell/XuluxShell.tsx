@@ -59,14 +59,19 @@ export function XuluxShell({
     (template: XuluxTemplate) => {
       setSelectedTemplate(template);
       onSetSelectedTemplateContext(toSelectedTemplateContext(template));
-      setCanvas({
-        status: template.previewUrl ? "ready" : "empty",
-        url: template.previewUrl ?? null,
-        source: template.previewUrl ? "template" : null,
-        error: null,
-      });
+      const hasPreview = !!template.previewUrl;
+      setCanvas(
+        hasPreview
+          ? {
+              status: "ready",
+              url: template.previewUrl!,
+              source: "template",
+              error: null,
+            }
+          : { status: "empty", url: null, source: null, error: null },
+      );
       setTemplatesOpen(false);
-      setViewMode(template.previewUrl ? "preview" : "chat");
+      setViewMode(hasPreview ? "preview" : "chat");
     },
     [onSetSelectedTemplateContext],
   );
@@ -111,6 +116,7 @@ export function XuluxShell({
         <XuluxLandingPage
           onStartChat={handleStartChat}
           onSelectTemplate={handleSelectTemplate}
+          onBrowseAll={() => setTemplatesOpen(true)}
         />
       ) : (
         <div className="flex min-h-0 flex-1 overflow-hidden">

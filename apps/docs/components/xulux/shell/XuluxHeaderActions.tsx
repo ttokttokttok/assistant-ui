@@ -1,22 +1,8 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { LayoutGrid, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-function HeaderPortal({ children }: { children: ReactNode }) {
-  const [container, setContainer] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setContainer(
-      document.querySelector<HTMLElement>("[data-sub-project-header-portal]"),
-    );
-  }, []);
-
-  if (!container) return null;
-  return createPortal(children, container);
-}
+import { HeaderPortal } from "./HeaderPortal";
 
 export function XuluxHeaderActions({
   visible,

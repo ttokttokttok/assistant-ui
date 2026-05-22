@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CodeIcon,
   XIcon,
@@ -43,6 +36,7 @@ import {
   type ViewportPreset,
 } from "@/lib/playground-url-state";
 import { XuluxApp } from "@/components/xulux/XuluxApp";
+import { HeaderPortal } from "@/components/xulux/shell/HeaderPortal";
 
 const VIEWPORT_PRESETS = {
   desktop: { width: "100%" as const, label: "Desktop", icon: Monitor },
@@ -350,19 +344,6 @@ function BuilderPlayground() {
       </div>
     </PlaygroundChatProvider>
   );
-}
-
-function HeaderPortal({ children }: { children: ReactNode }) {
-  const [container, setContainer] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setContainer(
-      document.querySelector<HTMLElement>("[data-sub-project-header-portal]"),
-    );
-  }, []);
-
-  if (!container) return null;
-  return createPortal(children, container);
 }
 
 export default function PlaygroundPage() {

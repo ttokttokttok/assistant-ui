@@ -3,16 +3,18 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-type Props = {
+export function Thumbnail({
+  gradient,
+  label,
+  className,
+  src,
+}: {
   gradient: string;
   label?: string | undefined;
   className?: string | undefined;
   src?: string | undefined;
-};
-
-export function Thumbnail({ gradient, label, className, src }: Props) {
+}) {
   const [imgFailed, setImgFailed] = useState(false);
-  const showImage = src && !imgFailed;
 
   return (
     <div
@@ -22,7 +24,7 @@ export function Thumbnail({ gradient, label, className, src }: Props) {
         className,
       )}
     >
-      {showImage ? (
+      {src && !imgFailed ? (
         // biome-ignore lint/performance/noImgElement: Template thumbnails may be generated preview images.
         <img
           src={src}
@@ -35,13 +37,13 @@ export function Thumbnail({ gradient, label, className, src }: Props) {
         <>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_55%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(0,0,0,0.25),transparent_60%)]" />
-          {label ? (
+          {label && (
             <div className="absolute inset-0 flex items-end p-2">
               <span className="font-medium text-[10px] text-white/70 uppercase tracking-wider">
                 {label}
               </span>
             </div>
-          ) : null}
+          )}
         </>
       )}
     </div>

@@ -8,14 +8,9 @@ import { GitHubIcon } from "@/components/icons/github";
 function toAbsoluteUrl(url: string | null): string | null {
   if (!url) return null;
   if (/^https?:\/\//.test(url)) return url;
-  if (typeof window === "undefined") return url;
-  return new URL(url, window.location.origin).toString();
-}
-
-function filenameFromDisposition(header: string | null): string | null {
-  if (!header) return null;
-  const match = /filename="?([^";]+)"?/i.exec(header);
-  return match?.[1] ?? null;
+  return typeof window !== "undefined"
+    ? new URL(url, window.location.origin).toString()
+    : url;
 }
 
 export function XuluxCanvas({
@@ -39,11 +34,11 @@ export function XuluxCanvas({
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [iframeVersion, setIframeVersion] = useState(0);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const resolvedPreviewUrl = toAbsoluteUrl(previewUrl);
+  const canRefresh = !!resolvedPreviewUrl && status === "ready";
   const canDownload = source === "refresh" && status === "ready";
   const canOpenSource =
     source === "template" && status === "ready" && sourceUrl;
-  const resolvedPreviewUrl = toAbsoluteUrl(previewUrl);
-  const canRefresh = !!resolvedPreviewUrl && status === "ready";
   const iframeKey = resolvedPreviewUrl
     ? `${resolvedPreviewUrl}-${iframeVersion}`
     : "empty";
@@ -54,42 +49,37 @@ export function XuluxCanvas({
 
   const handleRefreshPreview = useCallback(() => {
     setIsPreviewLoading(true);
-    setIframeVersion((value) => value + 1);
+    setIframeVersion((v) => v + 1);
   }, []);
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true);
     setDownloadError(null);
     try {
-      const response = await fetch("/api/xulux/download", {
+      const res = await fetch("/api/xulux/download", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId }),
       });
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as {
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
         throw new Error(payload?.error ?? "Failed to download workspace.");
       }
-
-      const blob = await response.blob();
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download =
-        filenameFromDisposition(response.headers.get("Content-Disposition")) ??
-        `xulux-workspace-${sessionId.slice(0, 12)}.tar.gz`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const a = Object.assign(document.createElement("a"), {
+        href: url,
+        download:
+          /filename="?([^";]+)"?/i.exec(
+            res.headers.get("Content-Disposition") ?? "",
+          )?.[1] ?? `xulux-workspace-${sessionId.slice(0, 12)}.tar.gz`,
+      });
+      a.click();
       URL.revokeObjectURL(url);
-    } catch (downloadErr) {
-      setDownloadError(
-        downloadErr instanceof Error
-          ? downloadErr.message
-          : String(downloadErr),
-      );
+    } catch (err) {
+      setDownloadError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsDownloading(false);
     }

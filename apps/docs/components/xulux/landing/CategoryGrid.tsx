@@ -5,15 +5,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { XuluxTemplate } from "../templates/types";
 import { useXuluxTemplateCatalog } from "../templates/useXuluxTemplateCatalog";
+import { TemplateCard } from "./TemplateCard";
 import { TemplateDetailModal } from "./TemplateDetailModal";
-import { Thumbnail } from "./Thumbnail";
 
-type Props = {
+export function CategoryGrid({
+  onBrowseAll,
+  onSelectTemplate,
+}: {
   onBrowseAll: () => void;
   onSelectTemplate: (template: XuluxTemplate) => void;
-};
-
-export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
+}) {
   const { templates, error } = useXuluxTemplateCatalog();
   const [selected, setSelected] = useState<XuluxTemplate | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,27 +29,22 @@ export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
   }, []);
 
   useEffect(() => {
-    void templates;
     const el = scrollRef.current;
     if (!el) return;
     updateScrollState();
     el.addEventListener("scroll", updateScrollState, { passive: true });
-    const resizeObserver = new ResizeObserver(updateScrollState);
-    resizeObserver.observe(el);
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
     return () => {
       el.removeEventListener("scroll", updateScrollState);
-      resizeObserver.disconnect();
+      ro.disconnect();
     };
-  }, [updateScrollState, templates]);
+  }, [updateScrollState]);
 
-  const scrollLeft = () => {
+  const scroll = (dir: 1 | -1) => {
     const el = scrollRef.current;
-    if (el) el.scrollBy({ left: -(el.clientWidth / 4), behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    const el = scrollRef.current;
-    if (el) el.scrollBy({ left: el.clientWidth / 4, behavior: "smooth" });
+    if (el)
+      el.scrollBy({ left: dir * (el.clientWidth / 4), behavior: "smooth" });
   };
 
   if (error) {
@@ -61,6 +57,9 @@ export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
   }
 
   if (templates.length === 0) return null;
+
+  const arrowCn =
+    "absolute top-1/2 z-10 -translate-y-1/2 flex size-8 items-center justify-center rounded-full border border-border bg-background shadow-md transition-opacity duration-150";
 
   return (
     <>
@@ -80,13 +79,11 @@ export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
         <div className="relative">
           <button
             type="button"
-            onClick={scrollLeft}
+            onClick={() => scroll(-1)}
             aria-label="Scroll left"
             className={cn(
-              "absolute top-1/2 -left-4 z-10 -translate-y-1/2",
-              "flex size-8 items-center justify-center rounded-full",
-              "border border-border bg-background shadow-md",
-              "transition-opacity duration-150",
+              arrowCn,
+              "-left-4",
               canScrollLeft ? "opacity-100" : "pointer-events-none opacity-0",
             )}
           >
@@ -99,44 +96,27 @@ export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
             style={{ scrollbarWidth: "none", scrollSnapType: "x mandatory" }}
           >
             {templates.map((template) => (
-              <button
+              <TemplateCard
                 key={template.id}
-                type="button"
-                onClick={() => setSelected(template)}
+                template={template}
+                onClick={setSelected}
+                className="flex min-w-[190px] flex-col gap-2 rounded-xl border border-border bg-card/40 p-2 text-left transition-colors hover:border-border/80 hover:bg-card/60"
                 style={{
                   scrollSnapAlign: "start",
                   flexShrink: 0,
                   width: "calc(25% - 12px)",
                 }}
-                className="flex min-w-[190px] flex-col gap-2 rounded-xl border border-border bg-card/40 p-2 text-left transition-colors hover:border-border/80 hover:bg-card/60"
-              >
-                <Thumbnail
-                  gradient={template.gradient}
-                  src={template.screenshotUrl}
-                  label={template.title}
-                  className="aspect-video w-full"
-                />
-                <div className="px-1 pb-1">
-                  <div className="min-w-0 flex-1 truncate font-medium text-sm">
-                    {template.title}
-                  </div>
-                  <div className="mt-0.5 line-clamp-2 text-muted-foreground text-xs">
-                    {template.description}
-                  </div>
-                </div>
-              </button>
+              />
             ))}
           </div>
 
           <button
             type="button"
-            onClick={scrollRight}
+            onClick={() => scroll(1)}
             aria-label="Scroll right"
             className={cn(
-              "absolute top-1/2 -right-4 z-10 -translate-y-1/2",
-              "flex size-8 items-center justify-center rounded-full",
-              "border border-border bg-background shadow-md",
-              "transition-opacity duration-150",
+              arrowCn,
+              "-right-4",
               canScrollRight ? "opacity-100" : "pointer-events-none opacity-0",
             )}
           >
@@ -149,9 +129,9 @@ export function CategoryGrid({ onBrowseAll, onSelectTemplate }: Props) {
         template={selected}
         allTemplates={templates}
         onClose={() => setSelected(null)}
-        onSelect={(template) => {
+        onSelect={(t) => {
           setSelected(null);
-          onSelectTemplate(template);
+          onSelectTemplate(t);
         }}
       />
     </>

@@ -1,43 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Plus } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type Props = {
-  value?: string | undefined;
-  onValueChange?: (value: string) => void;
-  onSubmit?: (value: string) => void;
-  placeholder?: string | undefined;
-};
-
 export function PromptInput({
-  value: controlled,
+  value,
   onValueChange,
   onSubmit,
   placeholder,
-}: Props) {
-  const [internal, setInternal] = useState("");
-  const value = controlled ?? internal;
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  onSubmit: (value: string) => void;
+  placeholder?: string | undefined;
+}) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const setValue = (nextValue: string) => {
-    if (onValueChange) onValueChange(nextValue);
-    else setInternal(nextValue);
-  };
-
   useEffect(() => {
-    void value;
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
-  }, [value]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = () => {
-    const trimmed = value.trim();
-    if (!trimmed) return;
-    onSubmit?.(trimmed);
+  const submit = () => {
+    const t = value.trim();
+    if (t) onSubmit(t);
   };
 
   return (
@@ -45,33 +34,24 @@ export function PromptInput({
       <textarea
         ref={textareaRef}
         value={value}
-        onChange={(event) => setValue(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.nativeEvent.isComposing) return;
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            handleSubmit();
+        onChange={(e) => onValueChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) return;
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            submit();
           }
         }}
         placeholder={placeholder}
         rows={1}
         className="w-full resize-none bg-transparent px-2 py-2 text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
       />
-      <div className="flex items-center justify-between pt-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="rounded-lg text-muted-foreground hover:text-foreground"
-          aria-label="Attach file"
-        >
-          <Plus className="size-4" />
-        </Button>
+      <div className="flex items-center justify-end pt-2">
         <Button
           type="button"
           size="icon-sm"
           className="rounded-lg"
-          onClick={handleSubmit}
+          onClick={submit}
           disabled={!value.trim()}
           aria-label="Send prompt"
         >
