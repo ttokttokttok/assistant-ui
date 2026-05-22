@@ -20,6 +20,7 @@ import type {
   MessageFormatRepository,
   AppendMessage,
   RunConfig,
+  McpAppMetadata,
 } from "@assistant-ui/core";
 import { getExternalStoreMessages } from "@assistant-ui/core";
 import type { ReadonlyJSONObject } from "assistant-stream/utils";
@@ -108,6 +109,7 @@ export const useAISDKRuntime = <UI_MESSAGE extends UIMessage = UIMessage>(
   const toolLastInputCacheRef = useRef<Map<string, ReadonlyJSONObject>>(
     new Map(),
   );
+  const mcpAppMetadataCacheRef = useRef<Map<string, McpAppMetadata>>(new Map());
   const lastRunConfigRef = useRef<RunConfig | undefined>(undefined);
 
   const hasExecutingTools = Object.values(toolStatuses).some(
@@ -129,6 +131,7 @@ export const useAISDKRuntime = <UI_MESSAGE extends UIMessage = UIMessage>(
         messageTiming,
         toolArgsKeyOrderCache: toolArgsKeyOrderCacheRef.current,
         toolLastInputCache: toolLastInputCacheRef.current,
+        mcpAppMetadataCache: mcpAppMetadataCacheRef.current,
         ...(chatHelpers.error && { error: chatHelpers.error.message }),
       }),
       [toolStatuses, messageTiming, chatHelpers.error],
