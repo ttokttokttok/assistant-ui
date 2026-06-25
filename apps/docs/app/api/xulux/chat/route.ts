@@ -16,6 +16,10 @@ import {
 } from "ai";
 import type { UIMessage } from "ai";
 import { beginTurn, finishTurn } from "@/lib/xulux/usage-budget";
+import {
+  createXuluxTurnOutcome,
+  getLatestUserMessageId,
+} from "@/lib/xulux/turn-outcome";
 import { createXuluxChatTools } from "./tools";
 
 type XuluxReasoningEffort =
@@ -80,11 +84,66 @@ type SelectedTemplateRequestContext = {
   downloadUrl?: unknown;
 };
 
+type ActivePreviewRequestContext = {
+  source: "template_modal" | "agent_tool";
+  templateId: string;
+  versionId?: string | null;
+  customized: boolean;
+  config?: Record<string, unknown>;
+};
+
 async function prepareMessages(messages: readonly UIMessage[]) {
   const modelMessages = await convertToModelMessages(
     injectQuoteContext([...messages]),
   );
   return pruneMessages({ messages: modelMessages, ...PRUNE_OPTIONS });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function normalizeActivePreviewContext(
+  value: unknown,
+): ActivePreviewRequestContext | null {
+  if (!isRecord(value)) return null;
+  const source = value.source;
+  const templateId = value.templateId;
+  const versionId = value.versionId;
+  const customized = value.customized;
+  if (
+    (source !== "template_modal" && source !== "agent_tool") ||
+    typeof templateId !== "string" ||
+    typeof customized !== "boolean"
+  ) {
+    return null;
+  }
+  return {
+    source,
+    templateId,
+    ...(typeof versionId === "string" || versionId === null
+      ? { versionId }
+      : {}),
+    customized,
+    ...(isRecord(value.config) ? { config: value.config } : {}),
+  };
+}
+
+function appendHiddenText(message: { content: unknown }, text: string) {
+  if (typeof message.content === "string") {
+    message.content = `${message.content}\n\n${text}`;
+  } else if (Array.isArray(message.content)) {
+    message.content = [...message.content, { type: "text", text }];
+  }
+}
+
+function formatActivePreviewContext(context: ActivePreviewRequestContext) {
+  return [
+    "<xulux_active_preview_context>",
+    "Treat this as the currently open preview state.",
+    JSON.stringify(context),
+    "</xulux_active_preview_context>",
+  ].join("\n");
 }
 
 function formatSelectedTemplateContext(
@@ -273,9 +332,13 @@ export async function POST(req: Request): Promise<Response> {
       config,
       sessionId,
       selectedTemplate,
+      activePreviewContext,
     } = body;
 
     const prunedMessages = await prepareMessages(messages);
+    const normalizedPreviewContext =
+      normalizeActivePreviewContext(activePreviewContext);
+    const userMessageId = getLatestUserMessageId(messages);
 
     const inputError = validateDocChatInput(prunedMessages);
     if (inputError) return inputError;
@@ -299,14 +362,18 @@ export async function POST(req: Request): Promise<Response> {
       const templateContext = formatSelectedTemplateContext(selectedTemplate);
       const firstUser = prunedMessages.find((m) => m.role === "user");
       if (templateContext && firstUser) {
-        if (typeof firstUser.content === "string") {
-          firstUser.content = `${firstUser.content}\n\n${templateContext}`;
-        } else if (Array.isArray(firstUser.content)) {
-          firstUser.content = [
-            ...firstUser.content,
-            { type: "text", text: templateContext },
-          ];
-        }
+        appendHiddenText(firstUser, templateContext);
+      }
+    }
+    if (normalizedPreviewContext) {
+      const latestUser = [...prunedMessages]
+        .reverse()
+        .find((m) => m.role === "user");
+      if (latestUser) {
+        appendHiddenText(
+          latestUser,
+          formatActivePreviewContext(normalizedPreviewContext),
+        );
       }
     }
 
@@ -396,7 +463,31 @@ export async function POST(req: Request): Promise<Response> {
           return { modelId: part.response.modelId };
         }
         if (part.type === "finish") {
-          return { custom: { usage: part.totalUsage } };
+          return {
+            usage: part.totalUsage,
+            custom: {
+              usage: part.totalUsage,
+              xulux: {
+                outcome: createXuluxTurnOutcome({
+                  type: "assistant_response_completed",
+                  requestId,
+                  sessionId: sessionId.trim(),
+                  distinctId,
+                  userMessageId,
+                }),
+                ...(normalizedPreviewContext
+                  ? {
+                      activePreviewContext: {
+                        value: normalizedPreviewContext,
+                        ...(userMessageId
+                          ? { injectedIntoUserMessageId: userMessageId }
+                          : {}),
+                      },
+                    }
+                  : {}),
+              },
+            },
+          };
         }
         return undefined;
       },
