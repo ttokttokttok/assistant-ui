@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useAuiState, type ToolCallMessagePart } from "@assistant-ui/react";
+import type { XuluxPreviewFrame } from "../templates/types";
 
 type OpenTemplatePreviewResult =
   | {
@@ -9,7 +10,8 @@ type OpenTemplatePreviewResult =
       templateId: string;
       versionId?: string;
       previewUrl: string;
-      downloadUrl: string;
+      downloadUrl?: string;
+      previewFrame?: XuluxPreviewFrame;
       title: string;
       summary?: string;
       customized?: boolean;
@@ -22,7 +24,8 @@ type OpenTemplatePreviewResult =
 
 type TemplatePreviewReady = {
   previewUrl: string;
-  downloadUrl: string;
+  downloadUrl?: string;
+  previewFrame?: XuluxPreviewFrame;
   templateId: string;
   versionId?: string;
   title: string;
@@ -83,7 +86,8 @@ export function XuluxTemplatePreviewObserver({
     if (payload.success) {
       onTemplatePreviewReady({
         previewUrl: payload.previewUrl,
-        downloadUrl: payload.downloadUrl,
+        ...(payload.downloadUrl ? { downloadUrl: payload.downloadUrl } : {}),
+        ...(payload.previewFrame ? { previewFrame: payload.previewFrame } : {}),
         templateId: payload.templateId,
         ...(payload.versionId !== undefined
           ? { versionId: payload.versionId }
