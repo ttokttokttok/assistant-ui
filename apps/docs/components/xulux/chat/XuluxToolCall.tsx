@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import { useAui, useAuiState } from "@assistant-ui/react";
-import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { parseLearnCourseStepResult } from "@/lib/xulux/learn/tool-result";
 import { useLearnMode } from "../learn/LearnModeContext";
@@ -268,6 +267,9 @@ function LearnCourseToolCall({
 }
 
 export function LearnCourseResultFooter() {
+  const isRunning = useAuiState(
+    (state) => state.message.status?.type === "running",
+  );
   const result = useAuiState((state) => {
     const content = state.message.content ?? [];
     for (let index = content.length - 1; index >= 0; index -= 1) {
@@ -279,7 +281,7 @@ export function LearnCourseResultFooter() {
     return undefined;
   });
   const parsed = parseLearnCourseStepResult(result);
-  if (!parsed) return null;
+  if (isRunning || !parsed) return null;
 
   return "finalStage" in parsed ? (
     <LearnCompletionCard result={parsed} />
@@ -302,14 +304,11 @@ function LearnStepCard({
 
   return (
     <article className="bg-card my-3 overflow-hidden rounded-xl border shadow-sm">
-      <div className="border-b p-4">
+      <div className="p-4">
         <p className="text-muted-foreground text-xs font-medium">
           Step {result.step.index} of {result.step.total}
         </p>
         <h3 className="mt-1 font-semibold">{result.step.title}</h3>
-      </div>
-      <div className="prose prose-sm dark:prose-invert max-w-none p-4">
-        <ReactMarkdown>{result.step.content}</ReactMarkdown>
       </div>
       <div className="border-t p-3">
         <button
