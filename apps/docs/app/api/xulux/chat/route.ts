@@ -482,12 +482,36 @@ export async function POST(req: Request): Promise<Response> {
     const modelConfig = resolveXuluxModel(config);
     const baseModel = modelConfig.model;
     const prismTracer = createPrismTracer({ evalRunId, localTraceUrl });
+    const latestUserContent = [...prunedMessages]
+      .reverse()
+      .find((message) => message.role === "user")?.content;
+    const latestUserText =
+      typeof latestUserContent === "string"
+        ? latestUserContent
+        : Array.isArray(latestUserContent)
+          ? latestUserContent
+              .filter(
+                (part): part is { type: "text"; text: string } =>
+                  !!part &&
+                  typeof part === "object" &&
+                  "type" in part &&
+                  part.type === "text" &&
+                  "text" in part &&
+                  typeof part.text === "string",
+              )
+              .map(({ text }) => text)
+              .join("")
+          : "";
+    const shouldAdvanceLearn =
+      !!learnContext &&
+      (latestUserText === "Start the Learn course." ||
+        latestUserText === "Move to the next course step.");
     const xuluxTools = createXuluxChatTools({
       clientTools: clientTools as Parameters<
         typeof createXuluxChatTools
       >[0]["clientTools"],
       routeUrl: req.url,
-      learnContext,
+      learnContext: shouldAdvanceLearn ? learnContext : null,
     });
     const toolManifest =
       process.env.XULUX_EVAL_MODE === "1"
@@ -530,30 +554,6 @@ export async function POST(req: Request): Promise<Response> {
         })
       : null;
 
-    const latestUserContent = [...prunedMessages]
-      .reverse()
-      .find((message) => message.role === "user")?.content;
-    const latestUserText =
-      typeof latestUserContent === "string"
-        ? latestUserContent
-        : Array.isArray(latestUserContent)
-          ? latestUserContent
-              .filter(
-                (part): part is { type: "text"; text: string } =>
-                  !!part &&
-                  typeof part === "object" &&
-                  "type" in part &&
-                  part.type === "text" &&
-                  "text" in part &&
-                  typeof part.text === "string",
-              )
-              .map(({ text }) => text)
-              .join("")
-          : "";
-    const shouldAdvanceLearn =
-      !!learnContext &&
-      (latestUserText === "Start the Learn course." ||
-        latestUserText === "Move to the next course step.");
     const learnSystemPrompt = learnContext
       ? `You are guiding the registered Learn course "${learnContext.courseId}".
 The canonical lesson and stage must come from getNextCourseStep.
@@ -582,7 +582,7 @@ After a tool result, briefly orient the learner to the product-owned lesson card
                       type: "tool" as const,
                       toolName: "getNextCourseStep",
                     }
-                  : ("auto" as const),
+                  : ("none" as const),
             }),
           }
         : {}),
