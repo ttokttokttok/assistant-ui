@@ -37,6 +37,10 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
     ? course.steps.findIndex(({ id }) => id === selectedStep.id)
     : -1;
   const [source, setSource] = useState<SourceState>({ status: "idle" });
+  const [sourceVersion, setSourceVersion] = useState(0);
+  const [diffViewMode, setDiffViewMode] = useState<"unified" | "split">(
+    "unified",
+  );
 
   useEffect(() => {
     if (!selectedStep) {
@@ -75,7 +79,7 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
         }
       });
     return () => controller.abort();
-  }, [course.id, course.steps, selectedIndex, selectedStep]);
+  }, [course.id, course.steps, selectedIndex, selectedStep, sourceVersion]);
 
   const archive = useMemo(
     () =>
@@ -111,7 +115,14 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
             variant={activeTab === id ? "secondary" : "ghost"}
             className="h-8 gap-1.5"
             disabled={id !== "curriculum" && !selectedStep}
-            onClick={() => openTab(id)}
+            onClick={() =>
+              openTab(
+                id,
+                id === "files" || id === "diff"
+                  ? (selectedFile ?? selectedStep?.focusFiles[0])
+                  : undefined,
+              )
+            }
           >
             <Icon className="size-3.5" />
             {label}
@@ -138,8 +149,16 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
           source.status === "loading" && <LoadingSource />}
         {(activeTab === "files" || activeTab === "diff") &&
           source.status === "error" && (
-            <div className="text-destructive flex h-full items-center justify-center p-6 text-sm">
-              {source.error}
+            <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-sm">
+              <p className="text-destructive">{source.error}</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setSourceVersion((version) => version + 1)}
+              >
+                Retry source
+              </Button>
             </div>
           )}
         {activeTab === "files" && archive && (
@@ -177,14 +196,30 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
                 </button>
               ))}
             </div>
-            <div className="min-w-0 flex-1 overflow-auto p-3">
-              {patch ? (
-                <DiffViewer patch={patch} viewMode="unified" />
-              ) : (
-                <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-                  Select a changed file to compare it.
-                </div>
-              )}
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              <div className="flex shrink-0 justify-end gap-1 border-b p-2">
+                {(["unified", "split"] as const).map((mode) => (
+                  <Button
+                    key={mode}
+                    type="button"
+                    size="sm"
+                    variant={diffViewMode === mode ? "secondary" : "ghost"}
+                    className="h-7 capitalize"
+                    onClick={() => setDiffViewMode(mode)}
+                  >
+                    {mode}
+                  </Button>
+                ))}
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto p-3">
+                {patch ? (
+                  <DiffViewer patch={patch} viewMode={diffViewMode} />
+                ) : (
+                  <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                    Select a changed file to compare it.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

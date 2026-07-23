@@ -53,6 +53,12 @@ export function LearnCourseObserver() {
   useEffect(() => {
     if (!parsed || handledRef.current.has(parsed.id)) return;
     handledRef.current.add(parsed.id);
+    const alreadyApplied =
+      "finalStage" in parsed.payload
+        ? progress.status === "completed"
+        : progress.currentStepId === parsed.payload.step.id;
+    if (alreadyApplied) return;
+
     const next = applyLearnCourseStepResult(progress, parsed.payload);
     updateProgress(next);
     openTab("preview");

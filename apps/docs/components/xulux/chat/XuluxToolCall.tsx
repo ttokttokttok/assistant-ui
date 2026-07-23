@@ -201,6 +201,8 @@ function LearnCourseToolCall({
   status,
   args,
 }: Pick<ToolCallMessagePartProps, "result" | "status" | "args">) {
+  const aui = useAui();
+  const { progress } = useLearnMode();
   const parsed = parseLearnCourseStepResult(result);
   if (status?.type === "running") {
     return (
@@ -214,11 +216,35 @@ function LearnCourseToolCall({
   }
   if (!parsed) {
     return (
-      <ToolErrorCard
-        signature="Course step"
-        error="The course step could not be loaded. Please retry."
-        args={args}
-      />
+      <article className="border-destructive/40 bg-destructive/5 my-3 rounded-xl border p-4">
+        <p className="text-sm font-medium">The course step could not load.</p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          Your saved progress is unchanged.
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3"
+          onClick={() =>
+            aui.thread().append({
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text:
+                    progress.currentStepId === null
+                      ? "Start the Learn course."
+                      : "Move to the next course step.",
+                },
+              ],
+            })
+          }
+        >
+          Retry
+        </Button>
+        <span className="sr-only">{JSON.stringify(args)}</span>
+      </article>
     );
   }
   return "finalStage" in parsed ? (
