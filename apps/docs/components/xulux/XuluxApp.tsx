@@ -95,6 +95,7 @@ export function XuluxApp({
 
   return (
     <XuluxRuntimeProvider
+      mode={mode}
       sessionId={sessionId}
       selectedTemplateContext={selectedTemplateContext}
       activePreviewContext={activePreviewContext}
@@ -120,12 +121,14 @@ export function XuluxApp({
 }
 
 function XuluxRuntimeProvider({
+  mode,
   sessionId,
   selectedTemplateContext,
   activePreviewContext,
   learnProgress,
   children,
 }: {
+  mode: XuluxMode;
   sessionId: string;
   selectedTemplateContext: SelectedTemplateContext | null;
   activePreviewContext: XuluxActivePreviewContext | null;
@@ -142,6 +145,7 @@ function XuluxRuntimeProvider({
 
   return (
     <XuluxRuntimeProviderInner
+      mode={mode}
       sessionId={sessionId}
       selectedTemplateContext={selectedTemplateContext}
       activePreviewContext={activePreviewContext}
@@ -170,6 +174,7 @@ function XuluxMissingCloudConfig() {
 }
 
 function XuluxRuntimeProviderInner({
+  mode,
   sessionId,
   selectedTemplateContext,
   activePreviewContext,
@@ -177,6 +182,7 @@ function XuluxRuntimeProviderInner({
   cloudBaseUrl,
   children,
 }: {
+  mode: XuluxMode;
   sessionId: string;
   selectedTemplateContext: SelectedTemplateContext | null;
   activePreviewContext: XuluxActivePreviewContext | null;
@@ -228,7 +234,7 @@ function XuluxRuntimeProviderInner({
   const transport = useMemo(() => {
     const chatFetch = createXuluxChatFetch();
     return new AssistantChatTransport({
-      api: "/api/xulux/chat",
+      api: mode === "learn" ? "/api/xulux/learn/chat" : "/api/xulux/chat",
       body: {
         get sessionId() {
           return sessionIdRef.current;
@@ -257,7 +263,7 @@ function XuluxRuntimeProviderInner({
         return res;
       },
     });
-  }, []);
+  }, [mode]);
 
   const runtime = useRemoteThreadListRuntime({
     adapter,

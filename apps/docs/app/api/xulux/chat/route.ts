@@ -366,8 +366,33 @@ Use inline code (\`backticks\`) for:
 </formatting>
 `;
 
+const LEARN_SYSTEM_PROMPT = `You are the Xulux Learn course guide.
+
+Your only job is to guide the learner through the registered assistant-ui course represented by the supplied Learn context.
+
+<behavior>
+- Be encouraging, concise, and instructional.
+- Treat the canonical lesson card, preview, files, and diff as the source of truth.
+- Answer questions about the current lesson without advancing the course.
+- Never behave like a template builder or starter-template assistant.
+- Never search for, configure, customize, or open hosted templates.
+- Do not invent course steps, project patches, preview URLs, source files, or downloads.
+</behavior>
+
+<tools>
+- getNextCourseStep is the only Learn tool.
+- It takes no arguments and returns the next registered canonical lesson and stage.
+- It is used only for the product-owned Start and Continue actions.
+- After its result, briefly orient the learner to the lesson card without reproducing all of its content.
+</tools>`;
+
 export async function POST(req: Request): Promise<Response> {
   const requestId = crypto.randomUUID();
+  const requestPathname = new URL(req.url).pathname;
+  const mode =
+    requestPathname === "/api/xulux/learn/chat"
+      ? ("learn" as const)
+      : ("playground" as const);
   if (!isAiPlaygroundEnabled) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
@@ -395,7 +420,10 @@ export async function POST(req: Request): Promise<Response> {
       learnContext: rawLearnContext,
     } = body;
     const learnContext = parseLearnContext(rawLearnContext);
-    if (rawLearnContext !== undefined && !learnContext) {
+    if (
+      (mode === "learn" && !learnContext) ||
+      (mode === "playground" && rawLearnContext !== undefined)
+    ) {
       return NextResponse.json(
         { error: "Invalid Learn context." },
         { status: 400 },
@@ -511,7 +539,8 @@ export async function POST(req: Request): Promise<Response> {
         typeof createXuluxChatTools
       >[0]["clientTools"],
       routeUrl: req.url,
-      learnContext: shouldAdvanceLearn ? learnContext : null,
+      mode,
+      learnContext,
     });
     const toolManifest =
       process.env.XULUX_EVAL_MODE === "1"
@@ -554,19 +583,15 @@ export async function POST(req: Request): Promise<Response> {
         })
       : null;
 
-    const learnSystemPrompt = learnContext
-      ? `You are guiding the registered Learn course "${learnContext.courseId}".
-The canonical lesson and stage must come from getNextCourseStep.
-Call getNextCourseStep only when the user starts or explicitly continues. For questions, answer using the current conversation and do not advance.
-After a tool result, briefly orient the learner to the product-owned lesson card and do not reproduce its full lesson content.`
-      : null;
-
     const result = streamText({
       model: prism?.model ?? posthogModel,
       ...(modelConfig.providerOptions
         ? { providerOptions: modelConfig.providerOptions }
         : undefined),
-      system: [SYSTEM_PROMPT, learnSystemPrompt, pageContext]
+      system: [
+        mode === "learn" ? LEARN_SYSTEM_PROMPT : SYSTEM_PROMPT,
+        pageContext,
+      ]
         .filter(Boolean)
         .join("\n\n"),
       messages: prunedMessages,
@@ -585,7 +610,9 @@ After a tool result, briefly orient the learner to the product-owned lesson card
                   : ("none" as const),
             }),
           }
-        : {}),
+        : mode === "learn"
+          ? { toolChoice: "none" as const }
+          : {}),
       onFinish: async ({ usage, response }) => {
         await finishTurn(
           sessionId.trim(),
