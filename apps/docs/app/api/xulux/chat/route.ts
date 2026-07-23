@@ -8,7 +8,6 @@ import { isAiPlaygroundEnabled } from "@/lib/feature-flags";
 import { NextResponse } from "next/server";
 import {
   convertToModelMessages,
-  hasToolCall,
   pruneMessages,
   stepCountIs,
   streamText,
@@ -387,7 +386,7 @@ Your only job is to guide the learner through the registered assistant-ui course
 - When the learner asks to start, begin, continue, proceed, or go to the next step, call getNextCourseStep immediately.
 - Understand ordinary variations such as "okay start", "continue", and "next"; never require special wording or tell the learner that you cannot advance.
 - Do not call the tool when the learner is only asking a question about the current lesson.
-- After its result, briefly orient the learner to the lesson card without reproducing all of its content.
+- After its result, explain what changed in this step in 2–4 useful sentences. The product UI renders progress, changed files, and Continue after your text, so do not duplicate those controls.
 </tools>`;
 
 export async function POST(req: Request): Promise<Response> {
@@ -576,9 +575,14 @@ export async function POST(req: Request): Promise<Response> {
         .join("\n\n"),
       messages: prunedMessages,
       maxOutputTokens: 8192,
-      stopWhen:
-        mode === "learn" ? hasToolCall("getNextCourseStep") : stepCountIs(50),
+      stopWhen: mode === "learn" ? stepCountIs(2) : stepCountIs(50),
       tools: xuluxTools,
+      ...(mode === "learn"
+        ? {
+            prepareStep: ({ stepNumber }: { stepNumber: number }) =>
+              stepNumber > 0 ? { toolChoice: "none" as const } : {},
+          }
+        : {}),
       onFinish: async ({ usage, response }) => {
         await finishTurn(
           sessionId.trim(),

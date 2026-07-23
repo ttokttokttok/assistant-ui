@@ -30,7 +30,7 @@ import Image from "next/image";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { XuluxPoweredBy } from "../XuluxPoweredBy";
 import { useXuluxTemplateContext } from "./XuluxTemplateContext";
-import { XuluxToolCall } from "./XuluxToolCall";
+import { LearnCourseResultFooter, XuluxToolCall } from "./XuluxToolCall";
 import { XuluxUsageLimitBanner } from "./XuluxUsageLimitBanner";
 
 const XULUX_CONTEXT_WINDOW = 400_000;
@@ -274,6 +274,7 @@ function XuluxAssistantMessage(): ReactNode {
             return null;
           }}
         </MessagePrimitive.Parts>
+        <LearnCourseResultFooter />
 
         <AuiIf
           condition={(s) =>

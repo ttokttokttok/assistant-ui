@@ -1,7 +1,10 @@
 "use client";
 
 import { ToolErrorCard, ToolStatusCard, ToolTraceCard } from "@/lib/tool-trace";
-import type { ToolCallMessagePartProps } from "@assistant-ui/react";
+import type {
+  ToolCallMessagePart,
+  ToolCallMessagePartProps,
+} from "@assistant-ui/react";
 import {
   BookOpenIcon,
   ExternalLinkIcon,
@@ -21,7 +24,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
-import { useAui } from "@assistant-ui/react";
+import { useAui, useAuiState } from "@assistant-ui/react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { parseLearnCourseStepResult } from "@/lib/xulux/learn/tool-result";
@@ -249,6 +252,35 @@ function LearnCourseToolCall({
       </article>
     );
   }
+  return (
+    <ToolTraceCard
+      icon={<BookOpenIcon className="size-3.5" />}
+      signature="getNextCourseStep"
+      description={
+        "finalStage" in parsed
+          ? "Course completed"
+          : `Loaded step ${parsed.step.index}: ${parsed.step.title}`
+      }
+      args={args}
+      result={result}
+    />
+  );
+}
+
+export function LearnCourseResultFooter() {
+  const result = useAuiState((state) => {
+    const content = state.message.content ?? [];
+    for (let index = content.length - 1; index >= 0; index -= 1) {
+      const part = content[index];
+      if (part?.type === "tool-call" && part.toolName === "getNextCourseStep") {
+        return (part as ToolCallMessagePart & { result?: unknown }).result;
+      }
+    }
+    return undefined;
+  });
+  const parsed = parseLearnCourseStepResult(result);
+  if (!parsed) return null;
+
   return "finalStage" in parsed ? (
     <LearnCompletionCard result={parsed} />
   ) : (
@@ -415,8 +447,12 @@ function LearnCompletionCard({
       {certificateOpen && (
         <CertificateDialog
           courseId={result.course.id}
-          certificateName={progress.certificateName}
-          certificateGeneratedAt={progress.certificateGeneratedAt}
+          {...(progress.certificateName
+            ? { certificateName: progress.certificateName }
+            : {})}
+          {...(progress.certificateGeneratedAt
+            ? { certificateGeneratedAt: progress.certificateGeneratedAt }
+            : {})}
           onGenerated={(name, generatedAt) => {
             updateProgress({
               ...progress,
@@ -563,12 +599,14 @@ function CertificateDialog({
               <label className="block text-sm">
                 Email
                 <input
-                  required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-background mt-1 w-full rounded-md border px-3 py-2"
                 />
+                <span className="text-muted-foreground mt-1 block text-xs">
+                  Optional
+                </span>
               </label>
               <label className="flex items-start gap-2 text-xs">
                 <input
