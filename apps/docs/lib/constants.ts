@@ -76,6 +76,13 @@ export const PRODUCTS: Product[] = [
 /** Internal products/pages that have sub-project routes (used by SubProjectLayout switcher). */
 export const SUB_PROJECTS: (Product & { slug: string })[] = [
   {
+    slug: "learn",
+    label: "Learn",
+    href: "/learn",
+    description: "Guided assistant-ui courses",
+    external: false,
+  },
+  {
     slug: "playground",
     label: "Playground",
     href: "/playground",

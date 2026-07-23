@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   AssistantCloud,
   AssistantRuntimeProvider,
@@ -23,6 +30,15 @@ import {
   type XuluxLimitBlock,
 } from "./chat/XuluxUsageLimitBanner";
 import type { XuluxActivePreviewContext } from "./runtime/types";
+import {
+  createInitialLearnProgress,
+  readLearnProgress,
+  writeLearnProgress,
+} from "@/lib/xulux/learn/progress";
+import { DEFAULT_LEARN_COURSE_ID } from "@/lib/xulux/learn/registry";
+import type { LearnProgress } from "@/lib/xulux/learn/types";
+
+export type XuluxMode = "playground" | "learn";
 
 export type SelectedTemplateContext = Pick<
   XuluxTemplate,
@@ -39,8 +55,20 @@ export type SelectedTemplateContext = Pick<
   | "docsUrl"
 >;
 
-export function XuluxApp() {
+export function XuluxApp({
+  mode = "playground",
+  courseId = DEFAULT_LEARN_COURSE_ID,
+  autoStart = false,
+}: {
+  mode?: XuluxMode;
+  courseId?: string;
+  autoStart?: boolean;
+}) {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
+  const [learnProgress, setLearnProgress] = useState<LearnProgress>(() =>
+    createInitialLearnProgress(courseId),
+  );
+  const [learnReady, setLearnReady] = useState(mode !== "learn");
   const [selectedTemplateContext, setSelectedTemplateContext] =
     useState<SelectedTemplateContext | null>(null);
   const [activePreviewContext, setActivePreviewContext] =
@@ -51,6 +79,19 @@ export function XuluxApp() {
     setActivePreviewContext(null);
   };
 
+  useEffect(() => {
+    if (mode !== "learn") return;
+    const stored = readLearnProgress(window.localStorage, courseId);
+    setLearnProgress(stored);
+    if (stored.threadId) setSessionId(stored.threadId);
+    setLearnReady(true);
+  }, [courseId, mode]);
+
+  const updateLearnProgress = useCallback((progress: LearnProgress) => {
+    setLearnProgress(progress);
+    writeLearnProgress(window.localStorage, progress);
+  }, []);
+
   return (
     <XuluxRuntimeProvider
       sessionId={sessionId}
@@ -59,6 +100,12 @@ export function XuluxApp() {
     >
       <AssistantPanelProvider>
         <XuluxShell
+          mode={mode}
+          courseId={courseId}
+          autoStart={autoStart}
+          learnProgress={learnProgress}
+          learnReady={learnReady}
+          onUpdateLearnProgress={updateLearnProgress}
           sessionId={sessionId}
           onSetSessionId={setSessionId}
           onSetSelectedTemplateContext={setSelectedTemplateContext}

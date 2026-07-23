@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   BookOpenIcon,
   CloudIcon,
@@ -41,6 +42,7 @@ type Props = {
 };
 
 export function LandingSuggestions({ onSelectPrompt, disabled }: Props) {
+  const router = useRouter();
   const analyticsCtx = useXuluxAnalytics();
   const [expandedLabel, setExpandedLabel] = useState<string | null>(null);
   const expandedGroup = XULUX_SUGGESTION_GROUPS.find(
@@ -94,6 +96,10 @@ export function LandingSuggestions({ onSelectPrompt, disabled }: Props) {
                       message_length: option.prompt.length,
                     }),
                   );
+                  if (option.href) {
+                    router.push(option.href);
+                    return;
+                  }
                   onSelectPrompt(option.prompt, {
                     id: option.id,
                     group: expandedGroup.label,

@@ -281,6 +281,22 @@ export const analytics = {
   },
 
   xulux: {
+    learnPageViewed: (props: {
+      session_id: string;
+      thread_id?: string;
+      pathname?: string;
+      course_id: string;
+      status: "not_started" | "in_progress" | "completed";
+    }) => trackEvent("learn_page_viewed", props),
+
+    learnCourseStarted: (props: {
+      session_id: string;
+      thread_id?: string;
+      pathname?: string;
+      course_id: string;
+      source: "chat" | "curriculum" | "suggestion";
+    }) => trackEvent("learn_course_started", props),
+
     playgroundViewed: (props: {
       session_id: string;
       thread_id?: string;
