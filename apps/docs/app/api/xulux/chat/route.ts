@@ -575,10 +575,15 @@ After a tool result, briefly orient the learner to the product-owned lesson card
       tools: xuluxTools,
       ...(shouldAdvanceLearn
         ? {
-            toolChoice: {
-              type: "tool" as const,
-              toolName: "getNextCourseStep",
-            },
+            prepareStep: ({ stepNumber }: { stepNumber: number }) => ({
+              toolChoice:
+                stepNumber === 0
+                  ? {
+                      type: "tool" as const,
+                      toolName: "getNextCourseStep",
+                    }
+                  : ("auto" as const),
+            }),
           }
         : {}),
       onFinish: async ({ usage, response }) => {
