@@ -1,5 +1,6 @@
 import {
   createInitialLearnProgress,
+  applyLearnCourseStepResult,
   deserializeLearnProgress,
   learnProgressStorageKey,
   readLearnProgress,
@@ -77,5 +78,62 @@ describe("Learn progress", () => {
     expect(
       writeLearnProgress(storage, createInitialLearnProgress(COURSE_ID, 500)),
     ).toBe(false);
+  });
+
+  it("advances once and keeps repeated results idempotent", () => {
+    const started: LearnProgress = {
+      ...createInitialLearnProgress(COURSE_ID, 100),
+      threadId: "thread_123",
+      status: "in_progress",
+      startedAt: 100,
+    };
+    const result = {
+      course: { id: COURSE_ID, status: "in_progress" as const },
+      step: {
+        id: "welcome",
+        title: "Welcome",
+        index: 1,
+        total: 2,
+        content: "Lesson",
+      },
+      stage: {
+        id: "P0",
+        previewPath: "/learn/preview/P0",
+        downloadUrl: "/download",
+        focusFiles: ["app/page.tsx"],
+      },
+      changes: { files: [], additions: 0, deletions: 0 },
+    };
+
+    const once = applyLearnCourseStepResult(started, result, 200);
+    const twice = applyLearnCourseStepResult(once, result, 300);
+    expect(once.currentStepId).toBe("welcome");
+    expect(twice.completedStepIds).toEqual([]);
+  });
+
+  it("marks every step complete on the terminal result", () => {
+    const progress: LearnProgress = {
+      ...createInitialLearnProgress(COURSE_ID, 100),
+      status: "in_progress",
+      currentStepId: "first-change",
+      selectedStepId: "first-change",
+      completedStepIds: ["welcome"],
+    };
+    const completed = applyLearnCourseStepResult(
+      progress,
+      {
+        course: { id: COURSE_ID, status: "completed" },
+        finalStage: {
+          id: "P1",
+          previewPath: "/learn/preview/P1",
+          downloadUrl: "/download",
+        },
+      },
+      500,
+    );
+
+    expect(completed.status).toBe("completed");
+    expect(completed.completedStepIds).toEqual(["welcome", "first-change"]);
+    expect(completed.completedAt).toBe(500);
   });
 });

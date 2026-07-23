@@ -40,16 +40,25 @@ function langFromPath(path: string): string | null {
 
 type Props = {
   archive: VirtualArchive;
+  selectedPath?: string | null;
+  onSelectedPathChange?: (path: string) => void;
 };
 
-export function XuluxFileBrowser({ archive }: Props) {
+export function XuluxFileBrowser({
+  archive,
+  selectedPath: controlledSelectedPath,
+  onSelectedPathChange,
+}: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const dirs = archive.tree
       .filter((node) => node.type === "directory")
       .map((node) => node.path);
     return new Set(dirs);
   });
-  const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const [internalSelectedPath, setInternalSelectedPath] = useState<
+    string | null
+  >(null);
+  const selectedPath = controlledSelectedPath ?? internalSelectedPath;
 
   const toggleDir = useCallback((path: string) => {
     setExpanded((s) => {
@@ -60,9 +69,13 @@ export function XuluxFileBrowser({ archive }: Props) {
     });
   }, []);
 
-  const openFile = useCallback((path: string) => {
-    setSelectedPath(path);
-  }, []);
+  const openFile = useCallback(
+    (path: string) => {
+      setInternalSelectedPath(path);
+      onSelectedPathChange?.(path);
+    },
+    [onSelectedPathChange],
+  );
 
   const fileContent = useMemo(() => {
     if (!selectedPath) return null;

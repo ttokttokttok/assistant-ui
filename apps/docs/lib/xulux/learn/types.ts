@@ -53,3 +53,35 @@ export type LearnStageChanges = {
   additions: number;
   deletions: number;
 };
+
+export type LearnContext = Pick<
+  LearnProgress,
+  "courseId" | "status" | "currentStepId" | "selectedStepId"
+>;
+
+export type LearnCourseStepResult =
+  | {
+      course: { id: string; status: "in_progress" };
+      step: {
+        id: string;
+        title: string;
+        index: number;
+        total: number;
+        content: string;
+      };
+      stage: {
+        id: string;
+        previewPath: string;
+        downloadUrl: string;
+        focusFiles: string[];
+      };
+      changes: LearnStageChanges;
+    }
+  | {
+      course: { id: string; status: "completed" };
+      finalStage: {
+        id: string;
+        previewPath: string;
+        downloadUrl: string;
+      };
+    };

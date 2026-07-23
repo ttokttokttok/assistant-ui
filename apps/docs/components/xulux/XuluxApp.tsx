@@ -37,6 +37,7 @@ import {
 } from "@/lib/xulux/learn/progress";
 import { DEFAULT_LEARN_COURSE_ID } from "@/lib/xulux/learn/registry";
 import type { LearnProgress } from "@/lib/xulux/learn/types";
+import { toLearnContext } from "@/lib/xulux/learn/context";
 
 export type XuluxMode = "playground" | "learn";
 
@@ -97,6 +98,7 @@ export function XuluxApp({
       sessionId={sessionId}
       selectedTemplateContext={selectedTemplateContext}
       activePreviewContext={activePreviewContext}
+      learnProgress={mode === "learn" ? learnProgress : null}
     >
       <AssistantPanelProvider>
         <XuluxShell
@@ -121,11 +123,13 @@ function XuluxRuntimeProvider({
   sessionId,
   selectedTemplateContext,
   activePreviewContext,
+  learnProgress,
   children,
 }: {
   sessionId: string;
   selectedTemplateContext: SelectedTemplateContext | null;
   activePreviewContext: XuluxActivePreviewContext | null;
+  learnProgress: LearnProgress | null;
   children: ReactNode;
 }) {
   const cloudBaseUrl =
@@ -141,6 +145,7 @@ function XuluxRuntimeProvider({
       sessionId={sessionId}
       selectedTemplateContext={selectedTemplateContext}
       activePreviewContext={activePreviewContext}
+      learnProgress={learnProgress}
       cloudBaseUrl={cloudBaseUrl}
     >
       {children}
@@ -168,12 +173,14 @@ function XuluxRuntimeProviderInner({
   sessionId,
   selectedTemplateContext,
   activePreviewContext,
+  learnProgress,
   cloudBaseUrl,
   children,
 }: {
   sessionId: string;
   selectedTemplateContext: SelectedTemplateContext | null;
   activePreviewContext: XuluxActivePreviewContext | null;
+  learnProgress: LearnProgress | null;
   cloudBaseUrl: string;
   children: ReactNode;
 }) {
@@ -183,6 +190,8 @@ function XuluxRuntimeProviderInner({
   selectedTemplateContextRef.current = selectedTemplateContext;
   const activePreviewContextRef = useRef(activePreviewContext);
   activePreviewContextRef.current = activePreviewContext;
+  const learnProgressRef = useRef(learnProgress);
+  learnProgressRef.current = learnProgress;
   const [limitBlock, setLimitBlock] = useState<XuluxLimitBlock | null>(null);
 
   useEffect(() => {
@@ -229,6 +238,10 @@ function XuluxRuntimeProviderInner({
         },
         get activePreviewContext() {
           return activePreviewContextRef.current;
+        },
+        get learnContext() {
+          const progress = learnProgressRef.current;
+          return progress ? toLearnContext(progress) : undefined;
         },
       },
       fetch: async (input, init) => {

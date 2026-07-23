@@ -12,11 +12,13 @@ export function LearnCurriculumOverview({
   progress,
   onStartCourse,
   startDisabled = false,
+  onSelectStep,
 }: {
   course: LearnCourseDefinition;
   progress: LearnProgress;
   onStartCourse: () => void;
   startDisabled?: boolean;
+  onSelectStep?: (stepId: string) => void;
 }) {
   const started = progress.status !== "not_started";
   const completedCount = progress.completedStepIds.length;
@@ -60,30 +62,34 @@ export function LearnCurriculumOverview({
             const complete = progress.completedStepIds.includes(step.id);
             const current = progress.currentStepId === step.id;
             return (
-              <li
-                key={step.id}
-                className="flex items-center gap-3 border-b px-4 py-3 last:border-b-0"
-              >
-                {complete ? (
-                  <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
-                    <Check className="size-3.5" />
+              <li key={step.id} className="border-b last:border-b-0">
+                <button
+                  type="button"
+                  disabled={!started || (!complete && !current)}
+                  onClick={() => onSelectStep?.(step.id)}
+                  className="hover:bg-muted/50 flex w-full items-center gap-3 px-4 py-3 text-left disabled:cursor-default disabled:hover:bg-transparent"
+                >
+                  {complete ? (
+                    <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full">
+                      <Check className="size-3.5" />
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground flex size-6 shrink-0 items-center justify-center">
+                      <Circle
+                        className="size-5"
+                        fill={current ? "currentColor" : "none"}
+                      />
+                    </span>
+                  )}
+                  <span className="min-w-0">
+                    <span className="text-muted-foreground block text-xs">
+                      Step {index + 1}
+                    </span>
+                    <span className="block truncate text-sm font-medium">
+                      {step.title}
+                    </span>
                   </span>
-                ) : (
-                  <span className="text-muted-foreground flex size-6 shrink-0 items-center justify-center">
-                    <Circle
-                      className="size-5"
-                      fill={current ? "currentColor" : "none"}
-                    />
-                  </span>
-                )}
-                <span className="min-w-0">
-                  <span className="text-muted-foreground block text-xs">
-                    Step {index + 1}
-                  </span>
-                  <span className="block truncate text-sm font-medium">
-                    {step.title}
-                  </span>
-                </span>
+                </button>
               </li>
             );
           })}

@@ -20,6 +20,7 @@ import {
   getLatestUserMessageId,
 } from "@/lib/xulux/turn-outcome";
 import { createXuluxChatTools } from "./tools";
+import { parseLearnContext } from "@/lib/xulux/learn/context";
 
 type XuluxReasoningEffort =
   | "none"
@@ -391,7 +392,15 @@ export async function POST(req: Request): Promise<Response> {
       sessionId,
       selectedTemplate,
       activePreviewContext,
+      learnContext: rawLearnContext,
     } = body;
+    const learnContext = parseLearnContext(rawLearnContext);
+    if (rawLearnContext !== undefined && !learnContext) {
+      return NextResponse.json(
+        { error: "Invalid Learn context." },
+        { status: 400 },
+      );
+    }
 
     if (!Array.isArray(messages)) {
       return new Response("Invalid messages format", { status: 400 });
@@ -478,6 +487,7 @@ export async function POST(req: Request): Promise<Response> {
         typeof createXuluxChatTools
       >[0]["clientTools"],
       routeUrl: req.url,
+      learnContext,
     });
     const toolManifest =
       process.env.XULUX_EVAL_MODE === "1"
@@ -520,16 +530,57 @@ export async function POST(req: Request): Promise<Response> {
         })
       : null;
 
+    const latestUserContent = [...prunedMessages]
+      .reverse()
+      .find((message) => message.role === "user")?.content;
+    const latestUserText =
+      typeof latestUserContent === "string"
+        ? latestUserContent
+        : Array.isArray(latestUserContent)
+          ? latestUserContent
+              .filter(
+                (part): part is { type: "text"; text: string } =>
+                  !!part &&
+                  typeof part === "object" &&
+                  "type" in part &&
+                  part.type === "text" &&
+                  "text" in part &&
+                  typeof part.text === "string",
+              )
+              .map(({ text }) => text)
+              .join("")
+          : "";
+    const shouldAdvanceLearn =
+      !!learnContext &&
+      (latestUserText === "Start the Learn course." ||
+        latestUserText === "Move to the next course step.");
+    const learnSystemPrompt = learnContext
+      ? `You are guiding the registered Learn course "${learnContext.courseId}".
+The canonical lesson and stage must come from getNextCourseStep.
+Call getNextCourseStep only when the user starts or explicitly continues. For questions, answer using the current conversation and do not advance.
+After a tool result, briefly orient the learner to the product-owned lesson card and do not reproduce its full lesson content.`
+      : null;
+
     const result = streamText({
       model: prism?.model ?? posthogModel,
       ...(modelConfig.providerOptions
         ? { providerOptions: modelConfig.providerOptions }
         : undefined),
-      system: [SYSTEM_PROMPT, pageContext].filter(Boolean).join("\n\n"),
+      system: [SYSTEM_PROMPT, learnSystemPrompt, pageContext]
+        .filter(Boolean)
+        .join("\n\n"),
       messages: prunedMessages,
       maxOutputTokens: 8192,
       stopWhen: stepCountIs(50),
       tools: xuluxTools,
+      ...(shouldAdvanceLearn
+        ? {
+            toolChoice: {
+              type: "tool" as const,
+              toolName: "getNextCourseStep",
+            },
+          }
+        : {}),
       onFinish: async ({ usage, response }) => {
         await finishTurn(
           sessionId.trim(),

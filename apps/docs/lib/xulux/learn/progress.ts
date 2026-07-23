@@ -1,5 +1,6 @@
 import { z } from "zod";
-import type { LearnProgress } from "./types";
+import type { LearnCourseStepResult, LearnProgress } from "./types";
+import { getLearnCourse } from "./registry";
 
 const learnProgressSchema = z.object({
   courseId: z.string(),
@@ -87,4 +88,39 @@ export function writeLearnProgress(
   } catch {
     return false;
   }
+}
+
+export function applyLearnCourseStepResult(
+  progress: LearnProgress,
+  result: LearnCourseStepResult,
+  now = Date.now(),
+): LearnProgress {
+  if (progress.courseId !== result.course.id) return progress;
+  const course = getLearnCourse(progress.courseId);
+
+  if (result.course.status === "completed") {
+    return {
+      ...progress,
+      status: "completed",
+      completedStepIds: course.steps.map(({ id }) => id),
+      completedAt: progress.completedAt ?? now,
+      updatedAt: now,
+    };
+  }
+
+  const previousCompleted =
+    progress.currentStepId &&
+    progress.currentStepId !== result.step.id &&
+    !progress.completedStepIds.includes(progress.currentStepId)
+      ? [...progress.completedStepIds, progress.currentStepId]
+      : progress.completedStepIds;
+
+  return {
+    ...progress,
+    status: "in_progress",
+    currentStepId: result.step.id,
+    selectedStepId: result.step.id,
+    completedStepIds: previousCompleted,
+    updatedAt: now,
+  };
 }
