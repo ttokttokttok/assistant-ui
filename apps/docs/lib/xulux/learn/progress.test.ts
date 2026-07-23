@@ -33,6 +33,8 @@ describe("Learn progress", () => {
       completedStepIds: ["welcome"],
       startedAt: 100,
       updatedAt: 200,
+      certificateName: "Ada Lovelace",
+      certificateGeneratedAt: 180,
     };
 
     expect(

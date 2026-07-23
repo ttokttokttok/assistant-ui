@@ -37,6 +37,8 @@ export type LearnProgress = {
   completedAt?: number;
   completionCelebrated?: boolean;
   certificatePromptDismissed?: boolean;
+  certificateName?: string;
+  certificateGeneratedAt?: number;
 };
 
 export type LearnFileChangeStatus = "added" | "modified" | "deleted";

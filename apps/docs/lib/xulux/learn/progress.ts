@@ -14,6 +14,8 @@ const learnProgressSchema = z.object({
   completedAt: z.number().optional(),
   completionCelebrated: z.boolean().optional(),
   certificatePromptDismissed: z.boolean().optional(),
+  certificateName: z.string().optional(),
+  certificateGeneratedAt: z.number().optional(),
 });
 
 export type LearnProgressStorage = Pick<Storage, "getItem" | "setItem">;

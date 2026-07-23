@@ -138,12 +138,22 @@ export function LearnCanvas({ onStartCourse }: { onStartCourse: () => void }) {
             onSelectStep={selectStep}
           />
         )}
-        {activeTab === "preview" && selectedStep && (
-          <iframe
-            className="h-full w-full border-0 bg-white"
-            title={`${selectedStep.title} preview`}
-            src={course.stages[selectedStep.stageId]!.previewPath}
-          />
+        {selectedStep && (
+          <div
+            aria-hidden={activeTab !== "preview"}
+            className={cn(
+              "absolute inset-0",
+              activeTab === "preview"
+                ? "z-10 opacity-100"
+                : "pointer-events-none z-0 opacity-0",
+            )}
+          >
+            <iframe
+              className="h-full w-full border-0 bg-white"
+              title={`${selectedStep.title} preview`}
+              src={course.stages[selectedStep.stageId]!.previewPath}
+            />
+          </div>
         )}
         {(activeTab === "files" || activeTab === "diff") &&
           source.status === "loading" && <LoadingSource />}

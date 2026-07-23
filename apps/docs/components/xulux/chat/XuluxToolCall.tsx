@@ -17,8 +17,10 @@ import {
   Download,
   Files,
   PartyPopper,
+  Award,
+  Sparkles,
 } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import { useAui } from "@assistant-ui/react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
@@ -363,7 +365,7 @@ function LearnCompletionCard({
         completionCelebrated: true,
         updatedAt: Date.now(),
       });
-      window.setTimeout(() => setCelebrate(false), 1800);
+      window.setTimeout(() => setCelebrate(false), 4200);
     }, 450);
     return () => window.clearTimeout(timer);
   }, [progress, updateProgress]);
@@ -413,6 +415,17 @@ function LearnCompletionCard({
       {certificateOpen && (
         <CertificateDialog
           courseId={result.course.id}
+          certificateName={progress.certificateName}
+          certificateGeneratedAt={progress.certificateGeneratedAt}
+          onGenerated={(name, generatedAt) => {
+            updateProgress({
+              ...progress,
+              certificateName: name,
+              certificateGeneratedAt: generatedAt,
+              certificatePromptDismissed: false,
+              updatedAt: generatedAt,
+            });
+          }}
           onClose={(dismissed) => {
             setCertificateOpen(false);
             if (dismissed) {
@@ -431,16 +444,25 @@ function LearnCompletionCard({
 
 function CertificateDialog({
   courseId,
+  certificateName,
+  certificateGeneratedAt,
+  onGenerated,
   onClose,
 }: {
   courseId: string;
+  certificateName?: string;
+  certificateGeneratedAt?: number;
+  onGenerated: (name: string, generatedAt: number) => void;
   onClose: (dismissed: boolean) => void;
 }) {
   const analyticsCtx = useXuluxAnalytics();
-  const [name, setName] = useState("");
+  const [name, setName] = useState(certificateName ?? "");
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState(
+    certificateGeneratedAt ?? null,
+  );
+  const generated = generatedAt !== null && name.trim().length > 0;
 
   return (
     <div
@@ -449,74 +471,126 @@ function CertificateDialog({
       aria-modal="true"
       aria-labelledby="certificate-title"
     >
-      <div className="bg-background w-full max-w-md rounded-xl border p-5 shadow-xl">
-        <PartyPopper className="size-6" />
-        <h2 id="certificate-title" className="mt-3 text-lg font-semibold">
-          {generated ? "Certificate generated" : "Generate your certificate"}
-        </h2>
+      <div className="bg-background max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border p-4 shadow-2xl sm:p-6">
         {generated ? (
           <>
-            <p className="text-muted-foreground mt-2 text-sm">
-              Congratulations, {name}. You completed Build your first assistant
-              UI.
-            </p>
-            <Button className="mt-5 w-full" onClick={() => onClose(false)}>
-              Done
-            </Button>
+            <div
+              className="relative overflow-hidden border-[6px] border-double border-amber-400 bg-[radial-gradient(circle_at_top,#fffbeb_0%,#ffffff_48%,#eff6ff_100%)] px-6 py-8 text-center text-slate-900 shadow-inner sm:px-12 sm:py-10"
+              aria-label={`Course completion certificate for ${name}`}
+            >
+              <div className="absolute top-3 left-3 size-10 border-t-2 border-l-2 border-amber-500" />
+              <div className="absolute top-3 right-3 size-10 border-t-2 border-r-2 border-amber-500" />
+              <div className="absolute bottom-3 left-3 size-10 border-b-2 border-l-2 border-amber-500" />
+              <div className="absolute right-3 bottom-3 size-10 border-r-2 border-b-2 border-amber-500" />
+              <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-blue-950 text-amber-300 shadow-lg ring-4 ring-amber-300/60">
+                <Award className="size-8" />
+              </div>
+              <p className="mt-5 text-xs font-semibold tracking-[0.32em] text-blue-950 uppercase">
+                Certificate of completion
+              </p>
+              <h2
+                id="certificate-title"
+                className="mt-3 font-serif text-3xl font-semibold text-blue-950 sm:text-4xl"
+              >
+                Xulux Learn
+              </h2>
+              <p className="mt-6 text-sm text-slate-600">
+                This certificate is proudly presented to
+              </p>
+              <p className="mx-auto mt-3 max-w-lg border-b border-amber-500/70 pb-2 font-serif text-2xl font-semibold sm:text-3xl">
+                {name}
+              </p>
+              <p className="mt-5 text-sm text-slate-600">
+                for successfully completing
+              </p>
+              <p className="mt-2 text-lg font-semibold text-blue-950">
+                Build your first assistant UI
+              </p>
+              <div className="mt-8 flex items-end justify-between gap-4 text-left text-[11px] text-slate-500">
+                <div>
+                  <p className="font-semibold text-slate-700">
+                    {formatCertificateDate(generatedAt)}
+                  </p>
+                  <p>Date awarded</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-mono font-semibold text-slate-700">
+                    XLX-{generatedAt.toString(36).toUpperCase()}
+                  </p>
+                  <p>Certificate ID</p>
+                </div>
+              </div>
+              <Sparkles className="absolute top-6 left-8 size-5 text-amber-500" />
+              <Sparkles className="absolute right-8 bottom-7 size-4 text-blue-700" />
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <p className="text-muted-foreground text-xs">
+                Certificate saved to this course.
+              </p>
+              <Button onClick={() => onClose(false)}>Done</Button>
+            </div>
           </>
         ) : (
-          <form
-            className="mt-4 space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              analytics.xulux.learnCertificateSubmitted(
-                withXuluxContext(analyticsCtx, {
-                  course_id: courseId,
-                  consent,
-                }),
-              );
-              setGenerated(true);
-            }}
-          >
-            <label className="block text-sm">
-              Name
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-background mt-1 w-full rounded-md border px-3 py-2"
-              />
-            </label>
-            <label className="block text-sm">
-              Email
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-background mt-1 w-full rounded-md border px-3 py-2"
-              />
-            </label>
-            <label className="flex items-start gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5"
-              />
-              Email me occasional assistant-ui learning updates (optional).
-            </label>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => onClose(true)}
-              >
-                Not now
-              </Button>
-              <Button type="submit">Generate</Button>
-            </div>
-          </form>
+          <>
+            <PartyPopper className="size-7" />
+            <h2 id="certificate-title" className="mt-3 text-lg font-semibold">
+              Generate your certificate
+            </h2>
+            <form
+              className="mt-4 space-y-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const awardedAt = Date.now();
+                analytics.xulux.learnCertificateSubmitted(
+                  withXuluxContext(analyticsCtx, {
+                    course_id: courseId,
+                    consent,
+                  }),
+                );
+                setGeneratedAt(awardedAt);
+                onGenerated(name.trim(), awardedAt);
+              }}
+            >
+              <label className="block text-sm">
+                Name
+                <input
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-background mt-1 w-full rounded-md border px-3 py-2"
+                />
+              </label>
+              <label className="block text-sm">
+                Email
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-background mt-1 w-full rounded-md border px-3 py-2"
+                />
+              </label>
+              <label className="flex items-start gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5"
+                />
+                Email me occasional assistant-ui learning updates (optional).
+              </label>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onClose(true)}
+                >
+                  Not now
+                </Button>
+                <Button type="submit">Generate</Button>
+              </div>
+            </form>
+          </>
         )}
       </div>
     </div>
@@ -524,24 +598,77 @@ function CertificateDialog({
 }
 
 function Confetti() {
+  const colors = [
+    "#f43f5e",
+    "#f59e0b",
+    "#22c55e",
+    "#06b6d4",
+    "#3b82f6",
+    "#8b5cf6",
+    "#ec4899",
+  ];
+
   return (
     <div
       className="pointer-events-none fixed inset-0 z-[60] overflow-hidden"
       aria-hidden
     >
-      {Array.from({ length: 28 }, (_, index) => (
+      <div className="absolute inset-x-0 top-[42%] text-center">
         <span
-          key={index}
-          className="absolute top-[-10px] h-3 w-2 animate-[fall_1.8s_ease-in_forwards] rounded-sm"
+          className="inline-block text-5xl opacity-0 sm:text-7xl"
           style={{
-            left: `${(index * 37) % 100}%`,
-            background: ["#22c55e", "#3b82f6", "#eab308", "#ec4899"][index % 4],
-            animationDelay: `${(index % 7) * 70}ms`,
-            transform: `rotate(${index * 29}deg)`,
+            animation: "party-pop .7s ease-out forwards",
           }}
-        />
-      ))}
-      <style>{`@keyframes fall { to { transform: translateY(105vh) rotate(720deg); opacity: .2; } }`}</style>
+        >
+          🎉
+        </span>
+      </div>
+      {Array.from({ length: 120 }, (_, index) => {
+        const fromLeft = index % 2 === 0;
+        const style = {
+          "--confetti-x": `${fromLeft ? -12 : 112}vw`,
+          "--confetti-drift": `${fromLeft ? 24 + ((index * 17) % 76) : -(24 + ((index * 17) % 76))}vw`,
+          "--confetti-spin": `${540 + ((index * 71) % 1080)}deg`,
+          left: `${(index * 47) % 100}%`,
+          width: `${5 + (index % 4) * 2}px`,
+          height: index % 5 === 0 ? "5px" : `${9 + (index % 5) * 2}px`,
+          borderRadius:
+            index % 5 === 0 ? "999px" : index % 3 === 0 ? "50%" : "2px",
+          background: colors[index % colors.length],
+          animationDelay: `${(index % 16) * 45}ms`,
+          animationDuration: `${2.4 + (index % 8) * 0.18}s`,
+          animationName: "party-confetti",
+          animationTimingFunction: "cubic-bezier(.15,.8,.25,1)",
+          animationFillMode: "forwards",
+        } as CSSProperties & Record<`--${string}`, string>;
+        return (
+          <span
+            key={index}
+            className="absolute top-[-5vh] opacity-0"
+            style={style}
+          />
+        );
+      })}
+      <style>{`
+        @keyframes party-confetti {
+          0% { transform: translate3d(var(--confetti-x), -8vh, 0) rotate(0deg); opacity: 1; }
+          18% { opacity: 1; }
+          100% { transform: translate3d(var(--confetti-drift), 112vh, 0) rotate(var(--confetti-spin)); opacity: .35; }
+        }
+        @keyframes party-pop {
+          0% { transform: scale(.25) rotate(-12deg); opacity: 0; }
+          55% { transform: scale(1.2) rotate(7deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
+}
+
+function formatCertificateDate(timestamp: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(timestamp);
 }
