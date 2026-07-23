@@ -1,0 +1,55 @@
+import type { ComponentType } from "react";
+
+export type LearnStageDefinition = {
+  id: string;
+  previewPath: string;
+  sourceRoot: string;
+  loadPreview: () => Promise<{ default: ComponentType }>;
+};
+
+export type LearnStepDefinition = {
+  id: string;
+  title: string;
+  lessonPath: string;
+  stageId: string;
+  focusFiles: string[];
+};
+
+export type LearnCourseDefinition = {
+  id: string;
+  title: string;
+  outcome: string;
+  steps: LearnStepDefinition[];
+  stages: Record<string, LearnStageDefinition>;
+};
+
+export type LearnProgressStatus = "not_started" | "in_progress" | "completed";
+
+export type LearnProgress = {
+  courseId: string;
+  threadId: string;
+  status: LearnProgressStatus;
+  currentStepId: string | null;
+  selectedStepId: string | null;
+  completedStepIds: string[];
+  startedAt?: number;
+  updatedAt: number;
+  completedAt?: number;
+  completionCelebrated?: boolean;
+  certificatePromptDismissed?: boolean;
+};
+
+export type LearnFileChangeStatus = "added" | "modified" | "deleted";
+
+export type LearnFileChange = {
+  path: string;
+  status: LearnFileChangeStatus;
+  additions: number;
+  deletions: number;
+};
+
+export type LearnStageChanges = {
+  files: LearnFileChange[];
+  additions: number;
+  deletions: number;
+};
