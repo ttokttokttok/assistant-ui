@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import { useAui, useAuiState } from "@assistant-ui/react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { parseLearnCourseStepResult } from "@/lib/xulux/learn/tool-result";
 import { useLearnMode } from "../learn/LearnModeContext";
@@ -523,12 +524,14 @@ function CertificateDialog({
               <p className="mt-5 text-xs font-semibold tracking-[0.32em] text-blue-950 uppercase">
                 Certificate of completion
               </p>
-              <h2
+              <Image
                 id="certificate-title"
-                className="mt-3 font-serif text-3xl font-semibold text-blue-950 sm:text-4xl"
-              >
-                Xulux Learn
-              </h2>
+                src="/brand/logotype.svg"
+                alt="assistant-ui"
+                width={150}
+                height={25}
+                className="mx-auto mt-4 h-8 w-auto sm:h-9"
+              />
               <p className="mt-6 text-sm text-slate-600">
                 This certificate is proudly presented to
               </p>
