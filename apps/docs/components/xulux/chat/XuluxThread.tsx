@@ -69,7 +69,9 @@ export function XuluxThread({
             <XuluxLearnWelcome
               started={learn.started}
               onStartCourse={learn.onStartCourse}
-              startDisabled={learn.startDisabled}
+              {...(learn.startDisabled !== undefined
+                ? { startDisabled: learn.startDisabled }
+                : {})}
             />
           ) : (
             <XuluxWelcome welcome={welcome} templateTitle={template?.title} />
@@ -89,7 +91,7 @@ export function XuluxThread({
 
         <ThreadPrimitive.ViewportFooter className="bg-background sticky bottom-0 mt-auto flex flex-col overflow-visible rounded-t-xl">
           <XuluxComposer
-            onNewThread={onNewThread}
+            {...(onNewThread ? { onNewThread } : {})}
             placeholder={
               learn
                 ? "Ask a question about the course..."
@@ -99,7 +101,7 @@ export function XuluxThread({
         </ThreadPrimitive.ViewportFooter>
       </ThreadPrimitive.Viewport>
       <AssistantFooter
-        onNewThread={onNewThread}
+        {...(onNewThread ? { onNewThread } : {})}
         showNewThread={!learn}
         contextWindow={XULUX_CONTEXT_WINDOW}
         centerContent={<XuluxPoweredBy className="min-w-0 truncate px-1" />}
@@ -138,7 +140,7 @@ function XuluxComposer({
 
   return (
     <div>
-      <XuluxUsageLimitBanner onNewThread={onNewThread} />
+      <XuluxUsageLimitBanner {...(onNewThread ? { onNewThread } : {})} />
       <AssistantComposer
         placeholder={placeholder}
         modelSelector={<XuluxModelSelector />}

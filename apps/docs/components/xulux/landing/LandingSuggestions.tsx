@@ -96,7 +96,7 @@ export function LandingSuggestions({ onSelectPrompt, disabled }: Props) {
                       message_length: option.prompt.length,
                     }),
                   );
-                  if (option.href) {
+                  if ("href" in option && option.href) {
                     router.push(option.href);
                     return;
                   }

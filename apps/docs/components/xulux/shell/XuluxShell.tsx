@@ -275,12 +275,11 @@ export function XuluxShell({
     }
 
     restoredLearnThreadRef.current = storedLearnThread.remoteId;
-    void aui
-      .threads()
-      .switchToThread(storedLearnThread.remoteId)
-      .catch(() => {
-        restoredLearnThreadRef.current = null;
-      });
+    void Promise.resolve(
+      aui.threads().switchToThread(storedLearnThread.remoteId),
+    ).catch(() => {
+      restoredLearnThreadRef.current = null;
+    });
   }, [aui, currentRemoteId, learnProgress, learnReady, mode, storedThreads]);
 
   const handleSelectTemplate = useCallback(
