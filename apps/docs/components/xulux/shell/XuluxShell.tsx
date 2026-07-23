@@ -254,6 +254,7 @@ export function XuluxShell({
     if (
       mode !== "learn" ||
       !learnReady ||
+      startInFlightRef.current ||
       learnProgress.status === "not_started" ||
       !learnProgress.threadId
     ) {
