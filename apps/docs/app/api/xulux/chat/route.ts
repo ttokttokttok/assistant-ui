@@ -13,6 +13,7 @@ import {
   streamText,
 } from "ai";
 import type { UIMessage } from "ai";
+import type { ToolSet } from "ai";
 import { beginTurn, finishTurn } from "@/lib/xulux/usage-budget";
 import {
   createXuluxDiagnosticMessageResponse,
@@ -534,7 +535,7 @@ export async function POST(req: Request): Promise<Response> {
       !!learnContext &&
       (latestUserText === "Start the Learn course." ||
         latestUserText === "Move to the next course step.");
-    const xuluxTools = createXuluxChatTools({
+    const xuluxTools: ToolSet = createXuluxChatTools({
       clientTools: clientTools as Parameters<
         typeof createXuluxChatTools
       >[0]["clientTools"],
