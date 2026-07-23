@@ -52,7 +52,7 @@ export function deserializeLearnProgress(
     if (!result.success || result.data.courseId !== courseId) {
       return createInitialLearnProgress(courseId, now);
     }
-    return result.data;
+    return result.data as LearnProgress;
   } catch {
     return createInitialLearnProgress(courseId, now);
   }
