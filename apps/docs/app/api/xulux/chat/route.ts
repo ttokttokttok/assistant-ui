@@ -8,6 +8,7 @@ import { isAiPlaygroundEnabled } from "@/lib/feature-flags";
 import { NextResponse } from "next/server";
 import {
   convertToModelMessages,
+  hasToolCall,
   pruneMessages,
   stepCountIs,
   streamText,
@@ -383,7 +384,9 @@ Your only job is to guide the learner through the registered assistant-ui course
 <tools>
 - getNextCourseStep is the only Learn tool.
 - It takes no arguments and returns the next registered canonical lesson and stage.
-- It is used only for the product-owned Start and Continue actions.
+- When the learner asks to start, begin, continue, proceed, or go to the next step, call getNextCourseStep immediately.
+- Understand ordinary variations such as "okay start", "continue", and "next"; never require special wording or tell the learner that you cannot advance.
+- Do not call the tool when the learner is only asking a question about the current lesson.
 - After its result, briefly orient the learner to the lesson card without reproducing all of its content.
 </tools>`;
 
@@ -511,30 +514,6 @@ export async function POST(req: Request): Promise<Response> {
     const modelConfig = resolveXuluxModel(config);
     const baseModel = modelConfig.model;
     const prismTracer = createPrismTracer({ evalRunId, localTraceUrl });
-    const latestUserContent = [...prunedMessages]
-      .reverse()
-      .find((message) => message.role === "user")?.content;
-    const latestUserText =
-      typeof latestUserContent === "string"
-        ? latestUserContent
-        : Array.isArray(latestUserContent)
-          ? latestUserContent
-              .filter(
-                (part): part is { type: "text"; text: string } =>
-                  !!part &&
-                  typeof part === "object" &&
-                  "type" in part &&
-                  part.type === "text" &&
-                  "text" in part &&
-                  typeof part.text === "string",
-              )
-              .map(({ text }) => text)
-              .join("")
-          : "";
-    const shouldAdvanceLearn =
-      !!learnContext &&
-      (latestUserText === "Start the Learn course." ||
-        latestUserText === "Move to the next course step.");
     const xuluxTools: ToolSet = createXuluxChatTools({
       clientTools: clientTools as Parameters<
         typeof createXuluxChatTools
@@ -597,23 +576,9 @@ export async function POST(req: Request): Promise<Response> {
         .join("\n\n"),
       messages: prunedMessages,
       maxOutputTokens: 8192,
-      stopWhen: stepCountIs(50),
+      stopWhen:
+        mode === "learn" ? hasToolCall("getNextCourseStep") : stepCountIs(50),
       tools: xuluxTools,
-      ...(shouldAdvanceLearn
-        ? {
-            prepareStep: ({ stepNumber }: { stepNumber: number }) => ({
-              toolChoice:
-                stepNumber === 0
-                  ? {
-                      type: "tool" as const,
-                      toolName: "getNextCourseStep",
-                    }
-                  : ("none" as const),
-            }),
-          }
-        : mode === "learn"
-          ? { toolChoice: "none" as const }
-          : {}),
       onFinish: async ({ usage, response }) => {
         await finishTurn(
           sessionId.trim(),

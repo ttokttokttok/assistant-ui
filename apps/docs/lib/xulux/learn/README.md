@@ -7,10 +7,11 @@ registered `P0` and `P1` stages while the product flow is validated.
 The dedicated `/api/xulux/learn/chat` endpoint uses a course-guide persona and
 registers only `getNextCourseStep`; Playground template, docs, source-map, and
 client tools are not part of its inventory. The request sends only `courseId`,
-status, current step, and selected step. Start and Continue force exactly one
-course-tool call, while normal learner questions use `toolChoice: "none"` so
-they cannot advance. The tool reads lessons and stages from the generated
-source snapshot and returns a validated product-owned result.
+status, current step, and selected step. The Learn agent decides when Start or
+Continue intent requires the tool, and the route stops after its first course
+tool result so a turn cannot advance twice. Normal questions are answered
+without a tool call. The tool reads lessons and stages from the generated source
+snapshot and returns a validated product-owned result.
 
 Preview, source, diff, and ZIP downloads all resolve through the course
 registry. Local storage persists the one course thread, current versus selected
