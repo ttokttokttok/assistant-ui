@@ -98,7 +98,7 @@ export function applyLearnCourseStepResult(
   if (progress.courseId !== result.course.id) return progress;
   const course = getLearnCourse(progress.courseId);
 
-  if (result.course.status === "completed") {
+  if ("finalStage" in result) {
     return {
       ...progress,
       status: "completed",

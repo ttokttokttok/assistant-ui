@@ -221,7 +221,7 @@ function LearnCourseToolCall({
       />
     );
   }
-  return parsed.course.status === "completed" ? (
+  return "finalStage" in parsed ? (
     <LearnCompletionCard result={parsed} />
   ) : (
     <LearnStepCard result={parsed} />
@@ -360,22 +360,21 @@ function LearnCompletionCard({
           >
             Final preview
           </Button>
-          <Button asChild className="gap-2">
-            <a
-              href={result.finalStage.downloadUrl}
-              onClick={() =>
-                analytics.xulux.learnCourseDownloaded(
-                  withXuluxContext(analyticsCtx, {
-                    course_id: result.course.id,
-                    stage_id: result.finalStage.id,
-                  }),
-                )
-              }
-            >
-              <Download className="size-4" />
-              Download project
-            </a>
-          </Button>
+          <a
+            href={result.finalStage.downloadUrl}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium"
+            onClick={() =>
+              analytics.xulux.learnCourseDownloaded(
+                withXuluxContext(analyticsCtx, {
+                  course_id: result.course.id,
+                  stage_id: result.finalStage.id,
+                }),
+              )
+            }
+          >
+            <Download className="size-4" />
+            Download project
+          </a>
           <Button
             type="button"
             variant="ghost"

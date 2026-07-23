@@ -15,15 +15,23 @@ export function LearnCourseObserver() {
   const { progress, updateProgress, openTab } = useLearnMode();
   const analyticsCtx = useXuluxAnalytics();
   const handledRef = useRef(new Set<string>());
-  const latestCall = useAuiState((state) =>
-    (state.thread.messages ?? [])
-      .flatMap((message) => message.content)
+  const latestCall = useAuiState((state) => {
+    const parts: unknown[] = [];
+    for (const message of state.thread.messages ?? []) {
+      if (message.role === "assistant") parts.push(...message.content);
+    }
+    return parts
       .filter(
         (part): part is ToolCallMessagePart =>
-          part.type === "tool-call" && part.toolName === "getNextCourseStep",
+          !!part &&
+          typeof part === "object" &&
+          "type" in part &&
+          part.type === "tool-call" &&
+          "toolName" in part &&
+          part.toolName === "getNextCourseStep",
       )
-      .at(-1),
-  );
+      .at(-1);
+  });
   const parsed = useMemo(() => {
     if (!latestCall) return null;
     const result = (
@@ -49,7 +57,7 @@ export function LearnCourseObserver() {
     updateProgress(next);
     openTab("preview");
 
-    if (parsed.payload.course.status === "completed") {
+    if ("finalStage" in parsed.payload) {
       analytics.xulux.learnCourseCompleted(
         withXuluxContext(analyticsCtx, {
           course_id: progress.courseId,
