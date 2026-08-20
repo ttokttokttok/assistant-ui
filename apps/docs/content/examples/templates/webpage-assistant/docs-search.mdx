@@ -1,0 +1,17 @@
+---
+title: Search-and-Navigate Docs Helper
+description: Prioritizes source search and page preview navigation across a docs corpus.
+catalog:
+  id: webpage-assistant-docs-search
+  kind: template
+  templateId: webpage-assistant
+  versionId: docs-search
+  category: { id: docs, name: Docs and Knowledge }
+  tags: [Search, Knowledge Base, Navigation]
+  prompt: Spin up a docs search assistant with source previews.
+  gradient: from-indigo-500/40 via-purple-500/30 to-pink-400/20
+  preview: { status: live, url: "https://0d9e27d14127c0eeadfc34b424cc7ed0.preview.bl.run/preview?v=docs-search" }
+  tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Docs assistant }
+  env: []
+  capabilities: { openInChat: true, downloadProfile: hosted-webpage-assistant, agentProfile: hosted-webpage-assistant }
+---
