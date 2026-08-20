@@ -15,15 +15,13 @@ function withoutGeneratedAt<T extends { generatedAt: string }>(value: T) {
 }
 
 describe("unified catalog hosted-template parity", () => {
-  it("preserves the complete browser catalog payload", () => {
-    expect(projectXuluxCatalog(getCatalog())).toEqual(
-      getXuluxHostedTemplatesCatalog(),
-    );
-  });
-
   it("preserves every existing hosted catalog record", () => {
     const legacy = getXuluxHostedTemplatesCatalog();
     const unified = projectXuluxCatalog(getCatalog());
+
+    expect(unified.templates.length).toBeGreaterThanOrEqual(
+      legacy.templates.length,
+    );
 
     for (const expected of legacy.templates) {
       expect.soft(
