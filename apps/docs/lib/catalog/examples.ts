@@ -9,7 +9,15 @@ export type ExampleCardItem = {
   link: string;
   external?: boolean | undefined;
   searchText?: string | undefined;
+  githubLink?: string | undefined;
 };
+
+function sourceUrl(sourcePath: string | undefined) {
+  if (!sourcePath) return undefined;
+  if (/^https?:\/\//i.test(sourcePath)) return sourcePath;
+  const kind = /\.[a-z0-9]+$/i.test(sourcePath) ? "blob" : "tree";
+  return `https://github.com/assistant-ui/assistant-ui/${kind}/main/${sourcePath}`;
+}
 
 export function getExamplesPageItems(): ExampleCardItem[] {
   const items = getCatalog().items;
@@ -31,11 +39,28 @@ export function getExamplesPageItems(): ExampleCardItem[] {
       ...(image ? { image } : {}),
       gradient: item.gradient,
       link: item.url,
+      ...(sourceUrl(item.sourcePath) ? { githubLink: sourceUrl(item.sourcePath) } : {}),
       searchText: [title, description, item.category.name, ...item.tags]
         .join(" ")
         .toLocaleLowerCase(),
     };
   });
+}
+
+export function getExamplesPageItemByUrl(url: string) {
+  return getExamplesPageItems().find((item) => item.link === url);
+}
+
+export function getExamplesPageNeighbors(url: string) {
+  const items = getExamplesPageItems();
+  const index = items.findIndex((item) => item.link === url);
+  if (index < 0) return {};
+  const previous = items[index - 1];
+  const next = items[index + 1];
+  return {
+    ...(previous ? { previous } : {}),
+    ...(next ? { next } : {}),
+  };
 }
 
 export function matchesExamplesQuery(item: ExampleCardItem, query: string) {

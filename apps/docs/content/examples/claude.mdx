@@ -4,12 +4,6 @@ description: A Claude-inspired assistant surface with serif typography, warm vis
 catalog: { id: claude, kind: example, order: 3, category: { id: assistant-ui-demos, name: Assistant UI Demos }, tags: [assistant-ui, Claude, clone, chat], prompt: Open the Claude Style Assistant demo., gradient: from-orange-400/35 via-stone-300/25 to-zinc-200/20, image: /screenshot/examples/claude.png, examplesCard: { title: Claude Clone, description: Customized colors and styles for a Claude look and feel., image: /screenshot/examples/claude.png }, sourcePath: apps/docs/components/examples/claude.tsx, preview: { status: live, url: /demos/claude }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Fixed demo }, env: [{ name: OPENAI_API_KEY, required: false, secret: true, description: Optional. Enables live AI responses in the downloaded starter app. }], capabilities: { openInChat: true, downloadProfile: demo-claude, agentProfile: demo-claude } }
 ---
 
-import { Claude } from "@/components/examples/claude";
-
-<div className="not-prose h-[600px]">
-  <Claude />
-</div>
-
 ## Overview
 
 The Claude Clone demonstrates how to customize assistant-ui to match Anthropic's Claude interface. The design leans on Claude's signature warm cream background, serif typography, and a deliberately minimal chrome — no shadows, no avatars, just a thin border on the composer and bubbles that fade into the page.

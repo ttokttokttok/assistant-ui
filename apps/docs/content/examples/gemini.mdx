@@ -4,12 +4,6 @@ description: A Gemini-inspired assistant surface with suggested starter prompts,
 catalog: { id: gemini, kind: example, order: 4, category: { id: assistant-ui-demos, name: Assistant UI Demos }, tags: [assistant-ui, Gemini, clone, chat], prompt: Open the Gemini Style Assistant demo., gradient: from-blue-500/35 via-sky-300/25 to-rose-300/20, image: /screenshot/examples/gemini.png, examplesCard: { title: Gemini Clone, description: Customized colors and styles for a Gemini look and feel., image: /screenshot/examples/gemini.png }, sourcePath: apps/docs/components/examples/gemini.tsx, preview: { status: live, url: /demos/gemini }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Fixed demo }, env: [{ name: OPENAI_API_KEY, required: false, secret: true, description: Optional. Enables live AI responses in the downloaded starter app. }], capabilities: { openInChat: true, downloadProfile: demo-gemini, agentProfile: demo-gemini } }
 ---
 
-import { Gemini } from "@/components/examples/gemini";
-
-<div className="not-prose h-[600px]">
-  <Gemini />
-</div>
-
 ## Overview
 
 The Gemini Clone shows how to restyle assistant-ui to match Google Gemini's current interface. The empty state centers a single-line greeting over a soft blue glow, and a single-row pill composer is shared by both the empty and chat states. Assistant replies render as full-width markdown with no avatar, and user turns sit in a rounded grey bubble.

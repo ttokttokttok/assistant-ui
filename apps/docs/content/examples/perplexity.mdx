@@ -4,12 +4,6 @@ description: A Perplexity-inspired search assistant surface with focused input, 
 catalog: { id: perplexity, kind: example, order: 6, category: { id: assistant-ui-demos, name: Assistant UI Demos }, tags: [assistant-ui, Perplexity, clone, search], prompt: Open the Perplexity Style Assistant demo., gradient: from-teal-500/35 via-cyan-300/25 to-zinc-200/20, image: /screenshot/examples/perplexity.png, examplesCard: { title: Perplexity Clone, description: Customized colors and styles for a Perplexity look and feel., image: /screenshot/examples/perplexity.png }, sourcePath: apps/docs/components/examples/perplexity.tsx, featured: true, preview: { status: live, url: /demos/perplexity }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Fixed demo }, env: [{ name: OPENAI_API_KEY, required: false, secret: true, description: Optional. Enables live AI responses in the downloaded starter app. }], capabilities: { openInChat: true, downloadProfile: demo-perplexity, agentProfile: demo-perplexity } }
 ---
 
-import { Perplexity } from "@/components/examples/perplexity";
-
-<div className="not-prose h-[600px]">
-  <Perplexity />
-</div>
-
 ## Overview
 
 The Perplexity Clone demonstrates how to customize assistant-ui to match Perplexity's search-focused interface. The empty state centers the `perplexity` wordmark above a multi-line composer with functional Search and Model dropdowns; the chat state keeps the composer pinned as a sticky follow-up footer.

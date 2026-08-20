@@ -28,3 +28,17 @@ export const COMMUNITY_EXAMPLES: ExampleCardItem[] = [
     external: true,
   },
 ];
+
+export const OFFICIAL_EXTERNAL_EXAMPLES: ExampleCardItem[] = [
+  {
+    id: "external-interactables",
+    title: "Interactables",
+    image: "/screenshot/examples/interactables.png",
+    description:
+      "Task board and sticky notes with AI-driven state updates and localStorage persistence.",
+    link: "https://github.com/assistant-ui/assistant-ui/tree/main/examples/with-interactables",
+    external: true,
+    searchText:
+      "interactables task board sticky notes ai state localstorage persistence",
+  },
+];

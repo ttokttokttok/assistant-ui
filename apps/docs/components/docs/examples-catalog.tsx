@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import type { ExampleCardItem } from "@/lib/catalog/examples";
 import { matchesExamplesQuery } from "@/lib/catalog/examples";
-import { ExampleCard } from "./example-card";
+import { ExampleCard } from "@/components/examples/example-card";
 
 export function ExamplesCatalog({ items }: { items: ExampleCardItem[] }) {
   const [query, setQuery] = useState("");
@@ -29,14 +29,14 @@ export function ExamplesCatalog({ items }: { items: ExampleCardItem[] }) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search examples and templates…"
-          className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border py-2 pr-3 pl-10 text-sm outline-none focus-visible:ring-2"
+          className="border-foreground/10 bg-foreground/[0.025] focus-visible:border-foreground/30 h-10 w-full rounded-xl border py-2 pr-3 pl-10 text-[13px] outline-none transition-colors"
         />
       </label>
 
       {filtered.length > 0 ? (
-        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((item) => (
-            <ExampleCard key={item.id} {...item} />
+        <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((item, index) => (
+            <ExampleCard key={item.id} index={index + 1} {...item} />
           ))}
         </div>
       ) : (

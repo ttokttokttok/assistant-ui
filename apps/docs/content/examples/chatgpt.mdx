@@ -4,12 +4,6 @@ description: Customized colors, typography, tools menu, composer, and message la
 catalog: { id: chatgpt, kind: example, order: 2, category: { id: assistant-ui-demos, name: Assistant UI Demos }, tags: [assistant-ui, ChatGPT, clone, chat], prompt: Open the ChatGPT Style Assistant demo., gradient: from-emerald-500/35 via-zinc-400/25 to-neutral-300/20, image: /screenshot/examples/chatgpt.png, examplesCard: { title: ChatGPT Clone, description: Customized colors and styles for a ChatGPT look and feel., image: /screenshot/examples/chatgpt.png }, sourcePath: apps/docs/components/examples/chatgpt.tsx, featured: true, preview: { status: live, url: /demos/chatgpt }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Fixed demo }, env: [{ name: OPENAI_API_KEY, required: false, secret: true, description: Optional. Enables live AI responses in the downloaded starter app. }], capabilities: { openInChat: true, downloadProfile: demo-chatgpt, agentProfile: demo-chatgpt } }
 ---
 
-import { ChatGPT } from "@/components/examples/chatgpt";
-
-<div className="not-prose h-[600px]">
-  <ChatGPT />
-</div>
-
 ## Overview
 
 The ChatGPT Clone demonstrates how to customize assistant-ui to match OpenAI's ChatGPT interface. This version mirrors the current chatgpt.com layout: a centered welcome composer, tooltipped attachment/dictation/voice controls, high-contrast user bubbles with Copy + Edit actions, and an always-visible assistant action bar with thumbs, share, speak, reload, and more.

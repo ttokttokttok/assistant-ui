@@ -4,15 +4,6 @@ description: Human-in-the-loop AI stockbroker built on LangGraph and assistant-u
 catalog: { id: stockbroker, kind: example, order: 9, category: { id: agents, name: Agents }, tags: [LangGraph, Example], prompt: Open the LangGraph stockbroker example., gradient: from-slate-500/40 via-zinc-500/30 to-neutral-400/20, image: /screenshot/stockbroker.png, examplesCard: { title: LangGraph Stockbroker, description: A stockbroker showing human in the loop with LangGraph, image: /screenshot/stockbroker.png }, sourcePath: https://github.com/assistant-ui/assistant-ui-stockbroker, preview: { status: stale, url: /xulux-preview/stockbroker }, tech: { framework: React, runtime: LangGraph, frontendPattern: Human-in-the-loop }, env: [], capabilities: { openInChat: true, agentProfile: stockbroker } }
 ---
 
-
-<div className="not-prose h-[600px]">
-  <iframe
-    title="Stockbroker example"
-    className="h-full w-full border-none"
-    src="https://assistant-ui-stockbroker.vercel.app/"
-  />
-</div>
-
 ## Overview
 
 A stock trading assistant built with LangGraph that demonstrates human-in-the-loop workflows. The assistant can research stocks, analyze market data, and prepare trades, but requires explicit user approval before executing any transactions. This pattern is essential for applications where AI assists with high-stakes decisions.

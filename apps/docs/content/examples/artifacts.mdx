@@ -4,15 +4,6 @@ description: Open-source Claude Artifacts implementation in React — generate w
 catalog: { id: artifacts, kind: example, order: 10, category: { id: ui-patterns, name: UI Patterns }, tags: [Artifacts, Example], prompt: Open the Claude Artifacts example., gradient: from-cyan-500/40 via-sky-500/30 to-blue-400/20, image: /screenshot/examples/artifacts.png, examplesCard: { title: Artifacts, description: Open Source Claude Artifacts. You can ask the bot to generate websites., image: /screenshot/examples/artifacts.png }, sourcePath: examples/with-artifacts, preview: { status: live, url: /xulux-preview/artifacts }, tech: { framework: Next.js, runtime: AI SDK, frontendPattern: Artifacts }, env: [], capabilities: { openInChat: true, agentProfile: artifacts } }
 ---
 
-import { Artifacts } from "@/components/examples/artifacts";
-import { ArtifactsRuntimeProvider } from "@/contexts/ArtifactsRuntimeProvider";
-
-<div className="not-prose h-[600px]">
-  <ArtifactsRuntimeProvider>
-    <Artifacts />
-  </ArtifactsRuntimeProvider>
-</div>
-
 ## Overview
 
 An open-source implementation of Claude Artifacts that allows users to generate interactive content like websites, documents, and applications directly within the chat interface. The AI generates HTML, CSS, and JavaScript code that renders in a live preview panel alongside the conversation.

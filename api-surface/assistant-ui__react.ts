@@ -2246,13 +2246,16 @@ type FrameMessage = {
   toolName: string;
   args: unknown;
 } | {
+  type: "tool-cancel";
+  id: string;
+} | {
   type: "tool-result";
   id: string;
   result?: unknown;
   error?: string;
 };
 
-type FrameMessageType = "model-context-request" | "model-context-update" | "tool-call" | "tool-result";
+type FrameMessageType = "model-context-request" | "model-context-update" | "tool-call" | "tool-cancel" | "tool-result";
 
 type FrontendTool<TArgs extends Record<string, unknown> = Record<string, unknown>, TResult = unknown> = ToolBase<TArgs, TResult> & {
   type: "frontend";
@@ -2318,6 +2321,7 @@ type GenerativeUISpec = {
 
 type GenericThreadHistoryAdapter<TMessage> = {
   load(): Promise<MessageFormatRepository<TMessage>>;
+  pin?(): void;
   append(item: MessageFormatItem<TMessage>): Promise<void>;
   update?(item: MessageFormatItem<TMessage>, localMessageId: string): Promise<void>;
   delete?(items: MessageFormatItem<TMessage>[]): Promise<void>;
@@ -3656,6 +3660,7 @@ type RemoteThreadListAdapter = {
   generateTitle(remoteId: string, unstable_messages: readonly ThreadMessage[]): Promise<AssistantStream>;
   fetch(threadId: string): Promise<RemoteThreadMetadata>;
   unstable_Provider?: RemoteThreadListProviderComponent | undefined;
+  unstable_useAdapters?: (() => RuntimeAdapters | null | undefined) | undefined;
 };
 
 type RemoteThreadListOptions = {
@@ -5239,7 +5244,7 @@ type ToolCallMessagePartProps<TArgs = any, TResult = unknown> = MessagePartState
 
 type ToolCallMessagePartStatus = {
   readonly type: "requires-action";
-  readonly reason: "interrupt";
+  readonly reason: "interrupt" | "tool-calls";
 } | MessagePartStatus;
 
 interface ToolCallReader<TArgs extends Record<string, unknown> = Record<string, unknown>, TResult = unknown> {
@@ -6309,7 +6314,7 @@ declare const useSmoothStatus: {
     readonly error?: unknown;
   } | {
     readonly type: "requires-action";
-    readonly reason: "interrupt";
+    readonly reason: "interrupt" | "tool-calls";
   };
   <TSelected>(selector: (state: {
     readonly type: "running";
@@ -6321,7 +6326,7 @@ declare const useSmoothStatus: {
     readonly error?: unknown;
   } | {
     readonly type: "requires-action";
-    readonly reason: "interrupt";
+    readonly reason: "interrupt" | "tool-calls";
   }) => TSelected): TSelected;
   (options: {
     optional: true;
@@ -6335,7 +6340,7 @@ declare const useSmoothStatus: {
     readonly error?: unknown;
   } | {
     readonly type: "requires-action";
-    readonly reason: "interrupt";
+    readonly reason: "interrupt" | "tool-calls";
   } | null;
   <TSelected>(options: {
     optional: true;
@@ -6349,7 +6354,7 @@ declare const useSmoothStatus: {
       readonly error?: unknown;
     } | {
       readonly type: "requires-action";
-      readonly reason: "interrupt";
+      readonly reason: "interrupt" | "tool-calls";
     }) => TSelected;
   }): TSelected | null;
 }, useSmoothStatusStore: {
@@ -6363,7 +6368,7 @@ declare const useSmoothStatus: {
     readonly error?: unknown;
   } | {
     readonly type: "requires-action";
-    readonly reason: "interrupt";
+    readonly reason: "interrupt" | "tool-calls";
   }>;
   (options: {
     optional: true;
@@ -6377,7 +6382,7 @@ declare const useSmoothStatus: {
     readonly error?: unknown;
   } | {
     readonly type: "requires-action";
-    readonly reason: "interrupt";
+    readonly reason: "interrupt" | "tool-calls";
   }> | null;
 };
 

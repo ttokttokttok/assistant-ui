@@ -4,12 +4,6 @@ description: A Grok-inspired assistant surface with minimal dark styling, center
 catalog: { id: grok, kind: example, order: 5, category: { id: assistant-ui-demos, name: Assistant UI Demos }, tags: [assistant-ui, Grok, clone, chat], prompt: Open the Grok Style Assistant demo., gradient: from-neutral-700/35 via-zinc-500/25 to-cyan-300/20, image: /screenshot/examples/grok.png, examplesCard: { title: Grok Clone, description: Customized colors and styles for a Grok look and feel., image: /screenshot/examples/grok.png }, sourcePath: apps/docs/components/examples/grok.tsx, preview: { status: live, url: /demos/grok }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Fixed demo }, env: [{ name: OPENAI_API_KEY, required: false, secret: true, description: Optional. Enables live AI responses in the downloaded starter app. }], capabilities: { openInChat: true, downloadProfile: demo-grok, agentProfile: demo-grok } }
 ---
 
-import { Grok } from "@/components/examples/grok";
-
-<div className="not-prose h-[600px]">
-  <Grok />
-</div>
-
 ## Overview
 
 The Grok Clone demonstrates how to customize assistant-ui to match xAI's Grok interface. The empty state centers the Grok wordmark above a pill composer with an animated trailing button that swaps between Mic, Send, and Cancel based on composer state. Models are picked from a real dropdown that animates open/collapse along with the composer.

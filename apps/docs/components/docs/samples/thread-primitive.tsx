@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AuiIf,
   ComposerPrimitive,
   ThreadPrimitive,
   MessagePrimitive,
@@ -15,7 +16,7 @@ export function ThreadPrimitiveSample() {
         <div className="mx-auto w-full max-w-lg">
           <ThreadPrimitive.Root className="flex h-[320px] flex-col">
             <ThreadPrimitive.Viewport className="flex flex-1 flex-col gap-3 overflow-y-auto scroll-smooth p-3">
-              <ThreadPrimitive.Empty>
+              <AuiIf condition={(s) => s.thread.isEmpty}>
                 <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
                   <p className="text-foreground text-sm font-medium">
                     Welcome!
@@ -24,7 +25,7 @@ export function ThreadPrimitiveSample() {
                     Ask a question to get started.
                   </p>
                 </div>
-              </ThreadPrimitive.Empty>
+              </AuiIf>
 
               <ThreadPrimitive.Messages
                 components={{
@@ -34,7 +35,7 @@ export function ThreadPrimitiveSample() {
               />
 
               <ThreadPrimitive.ViewportFooter className="sticky bottom-0 pt-2">
-                <ComposerPrimitive.Root className="border-border bg-muted dark:border-muted-foreground/15 relative flex w-full flex-col rounded-3xl border shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)]">
+                <ComposerPrimitive.Root className="border-border bg-muted dark:border-muted-foreground/15 relative flex w-full flex-col rounded-3xl border">
                   <ComposerPrimitive.Input
                     placeholder="Ask anything..."
                     className="field-sizing-content min-h-10 w-full resize-none bg-transparent px-5 pt-3.5 pb-2.5 text-sm leading-relaxed focus:outline-none"
