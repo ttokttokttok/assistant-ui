@@ -186,6 +186,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   const askAIFn = useGlobalAskAI();
 
   useEffect(() => {
+    if (!open) return;
     void loadSearchIndex()
       .then((records) => {
         setIndex(records);
@@ -194,7 +195,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
       .catch(() => {
         setIndexError(true);
       });
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
