@@ -1,0 +1,34 @@
+---
+title: Base Assistant UI
+description: A complete assistant-ui chat application with thread management, attachments, mentions, slash commands, model picker, and voice input.
+catalog:
+  id: base
+  kind: example
+  category:
+    id: assistant-ui-demos
+    name: Assistant UI Demos
+    description: Fixed assistant-ui demo surfaces shown as-is with downloadable starter apps.
+  tags: [assistant-ui, base, thread, composer]
+  prompt: Open the Base Assistant UI demo.
+  gradient: from-zinc-500/35 via-neutral-400/25 to-slate-300/20
+  featured: true
+  preview:
+    status: live
+    url: /demos/base
+    embed: true
+  docsUrl: /demos/base
+  sourcePath: apps/docs/components/examples/base.tsx
+  tech:
+    framework: Next.js
+    runtime: assistant-ui + AI SDK
+    frontendPattern: Fixed demo
+  env:
+    - name: OPENAI_API_KEY
+      required: false
+      secret: true
+      description: Optional. Enables live AI responses in the downloaded starter app.
+  capabilities:
+    openInChat: true
+    downloadProfile: demo-base
+    agentProfile: demo-base
+---

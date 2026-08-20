@@ -14,6 +14,7 @@ import { ArrowUpRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDemo } from "@/lib/demos";
 import { CatalogSummary } from "@/components/docs/catalog-summary";
+import { CatalogPreview } from "@/components/docs/catalog-preview";
 
 // The AI SDK example renders the Base demo component.
 const EXAMPLE_TO_DEMO_SLUG: Record<string, string> = { "ai-sdk": "base" };
@@ -99,6 +100,11 @@ export default async function Page(props: {
             )}
           </header>
         )}
+        {page.data.catalog &&
+          (page.data.catalog.kind === "template" ||
+            page.data.catalog.preview.embed) && (
+            <CatalogPreview item={page.data.catalog} />
+          )}
         <DocsRuntimeProvider>
           <page.data.body components={mdxComponents} />
         </DocsRuntimeProvider>

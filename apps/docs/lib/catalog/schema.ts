@@ -39,6 +39,7 @@ export const catalogItemSchema = z.object({
     status: z.enum(["live", "stale", "missing"]),
     url: z.string().min(1).optional(),
     frame: previewFrameSchema.optional(),
+    embed: z.boolean().default(false),
   }),
   docsUrl: z.string().min(1).optional(),
   sourcePath: z.string().min(1).optional(),
