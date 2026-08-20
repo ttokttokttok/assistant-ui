@@ -419,10 +419,13 @@ export default function PlaygroundPage() {
         if (!response.ok) throw new Error("Catalog unavailable");
         const catalog = await response.json();
         const template = resolveXuluxCatalogDeepLink(catalog, link);
-        setCatalogDeepLink(template ? { status: "ready", template } : { status: "error" });
+        setCatalogDeepLink(
+          template ? { status: "ready", template } : { status: "error" },
+        );
       })
       .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
         setCatalogDeepLink({ status: "error" });
       });
 
@@ -485,9 +488,12 @@ export default function PlaygroundPage() {
               </p>
             ) : catalogDeepLink.status === "error" ? (
               <div role="alert" className="m-auto max-w-sm px-6 text-center">
-                <p className="font-medium">This template link is not available.</p>
+                <p className="font-medium">
+                  This template link is not available.
+                </p>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  Return to Examples and choose an item that supports Open in chat.
+                  Return to Examples and choose an item that supports Open in
+                  chat.
                 </p>
               </div>
             ) : (

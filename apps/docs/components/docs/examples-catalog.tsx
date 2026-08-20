@@ -35,10 +35,15 @@ export function ExamplesCatalog({ items }: { items: ExampleCardItem[] }) {
 
       {filtered.length > 0 ? (
         <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((item) => <ExampleCard key={item.id} {...item} />)}
+          {filtered.map((item) => (
+            <ExampleCard key={item.id} {...item} />
+          ))}
         </div>
       ) : (
-        <p role="status" className="text-muted-foreground py-12 text-center text-sm">
+        <p
+          role="status"
+          className="text-muted-foreground py-12 text-center text-sm"
+        >
           No examples or templates match “{query.trim()}”.
         </p>
       )}

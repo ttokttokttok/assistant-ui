@@ -24,7 +24,9 @@ export function resolveXuluxCatalogDeepLink(
   link: XuluxCatalogDeepLink,
 ): XuluxTemplate | null {
   if (!link.catalogId || !link.templateId) return null;
-  const item = catalog.templates.find((candidate) => candidate.id === link.catalogId);
+  const item = catalog.templates.find(
+    (candidate) => candidate.id === link.catalogId,
+  );
   if (!item || !item.canStart) return null;
   if ((item.templateId ?? item.id) !== link.templateId) return null;
   if ((item.versionId ?? null) !== link.versionId) {

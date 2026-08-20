@@ -17,13 +17,14 @@ describe("catalog detail actions", () => {
   });
 
   it("uses the protected proxy for an exact hosted version", () => {
-    expect(getCatalogDetailActions(item("webpage-assistant-product-docs")))
-      .toEqual({
-        openInChatUrl:
-          "/playground?catalogId=webpage-assistant-product-docs&templateId=webpage-assistant&versionId=product-docs",
-        downloadUrl:
-          "/api/xulux/download-proxy?templateId=webpage-assistant&versionId=product-docs",
-      });
+    expect(
+      getCatalogDetailActions(item("webpage-assistant-product-docs")),
+    ).toEqual({
+      openInChatUrl:
+        "/playground?catalogId=webpage-assistant-product-docs&templateId=webpage-assistant&versionId=product-docs",
+      downloadUrl:
+        "/api/xulux/download-proxy?templateId=webpage-assistant&versionId=product-docs",
+    });
   });
 
   it("omits download when an Example has no download profile", () => {

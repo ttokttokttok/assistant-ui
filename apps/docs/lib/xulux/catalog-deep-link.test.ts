@@ -9,9 +9,11 @@ describe("Xulux catalog deep links", () => {
   const catalog = getXuluxCatalog();
 
   it("resolves an exact hosted template version", () => {
-    const link = readXuluxCatalogDeepLink(new URLSearchParams(
-      "catalogId=webpage-assistant-product-docs&templateId=webpage-assistant&versionId=product-docs",
-    ));
+    const link = readXuluxCatalogDeepLink(
+      new URLSearchParams(
+        "catalogId=webpage-assistant-product-docs&templateId=webpage-assistant&versionId=product-docs",
+      ),
+    );
     expect(link && resolveXuluxCatalogDeepLink(catalog, link)).toMatchObject({
       id: "webpage-assistant-product-docs",
       templateId: "webpage-assistant",

@@ -14,8 +14,7 @@ export type ExampleCardItem = {
 export function getExamplesPageItems(): ExampleCardItem[] {
   const items = getCatalog().items;
   const byOrder = (a: (typeof items)[number], b: (typeof items)[number]) =>
-    (a.order ?? Number.MAX_SAFE_INTEGER) -
-    (b.order ?? Number.MAX_SAFE_INTEGER);
+    (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER);
 
   return [
     ...items.filter((item) => item.kind === "example").sort(byOrder),
@@ -32,19 +31,18 @@ export function getExamplesPageItems(): ExampleCardItem[] {
       ...(image ? { image } : {}),
       gradient: item.gradient,
       link: item.url,
-      searchText: [
-        title,
-        description,
-        item.category.name,
-        ...item.tags,
-      ].join(" ").toLocaleLowerCase(),
+      searchText: [title, description, item.category.name, ...item.tags]
+        .join(" ")
+        .toLocaleLowerCase(),
     };
   });
 }
 
 export function matchesExamplesQuery(item: ExampleCardItem, query: string) {
   const normalized = query.trim().toLocaleLowerCase();
-  return normalized.length === 0 || item.searchText?.includes(normalized) === true;
+  return (
+    normalized.length === 0 || item.searchText?.includes(normalized) === true
+  );
 }
 
 export function getExamplePreview(slug: string) {
