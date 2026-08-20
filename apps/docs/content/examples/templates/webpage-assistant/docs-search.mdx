@@ -6,6 +6,7 @@ catalog:
   kind: template
   templateId: webpage-assistant
   versionId: docs-search
+  order: 3
   category: { id: docs, name: Docs and Knowledge }
   tags: [Search, Knowledge Base, Navigation]
   prompt: Spin up a docs search assistant with source previews.
@@ -13,5 +14,29 @@ catalog:
   preview: { status: live, url: "https://0d9e27d14127c0eeadfc34b424cc7ed0.preview.bl.run/preview?v=docs-search" }
   tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Docs assistant }
   env: []
+  featured: true
+  intent:
+    goodFor: [Docs search, Source previews, Knowledge base navigation]
+    notFor: [Support ticket triage, CRM workflows]
+    exampleUserRequests:
+      - Build me an API docs assistant for a billing API.
+      - Create a website copilot that explains the current page.
+      - Make a docs search assistant that can generate code snippets.
+  customization:
+    safeFieldsSummary:
+      - hostUi docs shell names, default page, nav groups, and rendered pages
+      - assistant product/docs/assistant names, welcome copy, labels, and suggested prompts
+      - assistant tools with fixed ids, display metadata, implementation hints, and renderer types
+      - assistant.demoFlows steps with assistant text, tool order, tool input, mock output, and final response
+      - brandTheme shared visual tokens
+      - template-owned contract at /api/template/contract
+    supportedRenderers: [sourceResults, pagePreview, codeSnippet, generic]
+    sourceEditFiles:
+      - lib/docs/host-ui.ts
+      - lib/docs/assistant-config.ts
+      - lib/docs/tool-data.ts
+      - lib/docs/version-presets.ts
+      - lib/docs/preview-schema.ts
+      - lib/docs/download-materializer.ts
   capabilities: { openInChat: true, downloadProfile: hosted-webpage-assistant, agentProfile: hosted-webpage-assistant }
 ---

@@ -25,6 +25,7 @@ export const catalogItemSchema = z.object({
   kind: z.enum(["example", "template"]),
   templateId: z.string().min(1).optional(),
   versionId: z.string().min(1).optional(),
+  order: z.number().int().nonnegative().optional(),
   category: z.object({
     id: z.string().min(1),
     name: z.string().min(1),

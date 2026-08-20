@@ -29,6 +29,7 @@ function downloadUrl(item: Item) {
 function docsUrl(item: Item) {
   if (item.docsUrl) return item.docsUrl;
   const profile = item.capabilities.downloadProfile;
+  if (profile?.startsWith("hosted-")) return undefined;
   return profile?.startsWith("demo-")
     ? `/demos/${profile.slice("demo-".length)}`
     : item.url;
@@ -38,7 +39,7 @@ function versionsFor(item: Item, items: readonly Item[]) {
   if (!item.templateId) return undefined;
   const siblings = items.filter(
     (candidate) => candidate.templateId === item.templateId,
-  );
+  ).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   if (siblings.length < 2) return undefined;
   return siblings.map((candidate) => ({
     id: candidate.versionId!,
@@ -55,7 +56,9 @@ export function projectXuluxCatalog(catalog: Catalog): XuluxTemplateCatalog {
     templates: catalog.items.map<XuluxTemplate>((item) => ({
       id: item.id,
       ...(item.templateId ? { templateId: item.templateId } : {}),
-      ...(item.versionId ? { versionId: item.versionId } : {}),
+      ...(item.versionId && item.capabilities.downloadProfile !== "hosted-base-assistant-ui"
+        ? { versionId: item.versionId }
+        : {}),
       title: item.title,
       description: item.description,
       categoryId: item.category.id,
@@ -73,7 +76,7 @@ export function projectXuluxCatalog(catalog: Catalog): XuluxTemplateCatalog {
         ? { screenshotUrl: item.image }
         : {}),
       ...(item.sourcePath ? { sourcePath: item.sourcePath } : {}),
-      docsUrl: docsUrl(item),
+      ...(docsUrl(item) ? { docsUrl: docsUrl(item) } : {}),
       ...(item.featured !== undefined ? { featured: item.featured } : {}),
       ...(versionsFor(item, catalog.items)
         ? { versions: versionsFor(item, catalog.items) }

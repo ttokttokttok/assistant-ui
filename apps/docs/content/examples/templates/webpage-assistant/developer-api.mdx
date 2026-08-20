@@ -6,6 +6,7 @@ catalog:
   kind: template
   templateId: webpage-assistant
   versionId: developer-api
+  order: 1
   category:
     id: docs
     name: Docs and Knowledge
@@ -21,16 +22,25 @@ catalog:
     goodFor: [API authentication, Webhook handlers, SDK setup]
     notFor: [Support ticket triage, CRM workflows]
     exampleUserRequests:
-      - Build an API docs assistant for a billing API.
-      - Help developers debug authentication and webhook setup.
+      - Build me an API docs assistant for a billing API.
+      - Create a website copilot that explains the current page.
+      - Make a docs search assistant that can generate code snippets.
   customization:
     safeFieldsSummary:
-      - Docs shell names, default page, navigation groups, and rendered pages
-      - Assistant names, welcome copy, labels, and suggested prompts
+      - hostUi docs shell names, default page, nav groups, and rendered pages
+      - assistant product/docs/assistant names, welcome copy, labels, and suggested prompts
+      - assistant tools with fixed ids, display metadata, implementation hints, and renderer types
+      - assistant.demoFlows steps with assistant text, tool order, tool input, mock output, and final response
+      - brandTheme shared visual tokens
+      - template-owned contract at /api/template/contract
     supportedRenderers: [sourceResults, pagePreview, codeSnippet, generic]
     sourceEditFiles:
       - lib/docs/host-ui.ts
       - lib/docs/assistant-config.ts
+      - lib/docs/tool-data.ts
+      - lib/docs/version-presets.ts
+      - lib/docs/preview-schema.ts
+      - lib/docs/download-materializer.ts
   tech:
     framework: Next.js
     runtime: assistant-ui + AI SDK

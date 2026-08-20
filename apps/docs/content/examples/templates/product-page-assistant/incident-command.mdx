@@ -1,5 +1,43 @@
 ---
 title: Incident Command Assistant
 description: Prepare incident triage notes for reliability and on-call teams.
-catalog: { id: product-page-assistant-incident-command, kind: template, templateId: product-page-assistant, versionId: incident-command, category: { id: support, name: Support and Operations }, tags: [Incident, On-call, Reliability], prompt: Spin up an incident command assistant for on-call teams., gradient: from-violet-500/40 via-fuchsia-500/25 to-sky-400/20, preview: { status: live, url: "https://8fd186ab9f30417b876d717f734067a9.preview.bl.run/preview?v=incident-command" }, tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Support modal + dashboard }, env: [], capabilities: { openInChat: true, downloadProfile: hosted-product-page-assistant, agentProfile: hosted-product-page-assistant } }
+catalog:
+  id: product-page-assistant-incident-command
+  kind: template
+  templateId: product-page-assistant
+  versionId: incident-command
+  order: 1
+  category: { id: support, name: Support and Operations }
+  tags: [Incident, On-call, Reliability]
+  prompt: Spin up an incident command assistant for on-call teams.
+  gradient: from-violet-500/40 via-fuchsia-500/25 to-sky-400/20
+  preview: { status: live, url: "https://8fd186ab9f30417b876d717f734067a9.preview.bl.run/preview?v=incident-command" }
+  featured: true
+  intent:
+    goodFor: [Incident triage, On-call handoffs, Reliability workflows]
+    notFor: [Docs search, API reference helpers]
+    exampleUserRequests:
+      - Build me a support assistant that triages customer issues.
+      - Create a troubleshooting copilot with two tool calls and a handoff summary.
+      - Make an integration health assistant for support teams.
+  customization:
+    safeFieldsSummary:
+      - hostUi dashboard shell names, labels, metrics, status lists, and activity content
+      - assistant company/product/assistant names, welcome copy, labels, prompts, and scenario ids
+      - assistant tools with fixed ids, display metadata, implementation hints, and card types
+      - assistant.demoFlows steps with assistant text, tool order, tool input, mock output, and final response
+      - support-specific assistant.toolData for routing, account status, labels, and scenario metadata
+      - brandTheme shared visual tokens
+      - template-owned contract at /api/template/contract
+    supportedRenderers: [analysis, summary, generic]
+    sourceEditFiles:
+      - lib/support/host-ui.ts
+      - lib/support/assistant-config.ts
+      - lib/support/tool-data.ts
+      - lib/support/version-presets.ts
+      - lib/support/preview-schema.ts
+      - lib/support/download-materializer.ts
+  tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Support modal + dashboard }
+  env: []
+  capabilities: { openInChat: true, downloadProfile: hosted-product-page-assistant, agentProfile: hosted-product-page-assistant }
 ---

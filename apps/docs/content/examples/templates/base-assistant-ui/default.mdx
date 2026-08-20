@@ -1,6 +1,6 @@
 ---
 title: Configurable Base Assistant UI
-description: Hosted configurable chat template with threads, composer, suggestions, slash commands, and AI SDK runtime.
+description: The assistant-ui Base demo as a hosted configurable chat template with threads, composer, mic input, suggestions, slash commands, local/cloud persistence fallback, and no-key demo flows.
 catalog:
   id: base-assistant-ui
   kind: template
@@ -8,12 +8,35 @@ catalog:
   versionId: default
   category: { id: base, name: Base Chat Templates }
   tags: [assistant-ui, Base, Chat, AI SDK, Customizable]
-  prompt: Spin up the configurable assistant-ui Base chat app.
+  prompt: Spin up the configurable assistant-ui Base chat app with thread history, suggestions, slash commands, model picker, mic input, and AI SDK runtime.
   gradient: from-teal-500/40 via-cyan-500/30 to-zinc-400/20
   featured: true
   preview: { status: live, url: https://71e34324f44b97fed5523a6a9857f14b.preview.bl.run }
   docsUrl: /demos/base
   sourcePath: docsAgentVersion/xuluxVersion2Agent/generated-templates/base-assistant-ui
+  intent:
+    goodFor:
+      - General chat assistants
+      - assistant-ui Base starters
+      - Configurable no-key demos
+    notFor: [Docs article shells, Support dashboard workflows]
+    exampleUserRequests:
+      - Build me a branded assistant-ui Base chat app.
+      - Customize the welcome message, suggestions, theme, and demo flows.
+      - Create a downloadable starter from the Base assistant template.
+  customization:
+    safeFieldsSummary:
+      - brandTheme preset plus accent, background, surface, and text hex overrides
+      - assistant appName, welcome headline/body, composer and thread labels
+      - assistant suggestionGroups and slashCommands with controlled icon ids
+      - assistant tools and demoFlows for deterministic no-key mock behavior
+    supportedRenderers: [generic]
+    sourceEditFiles:
+      - lib/base/defaults.ts
+      - lib/base/preview-schema.ts
+      - lib/base/template-contract.ts
+      - lib/base/runtime-config.ts
+      - lib/base/download-materializer.ts
   tech: { framework: Next.js, runtime: assistant-ui + AI SDK, frontendPattern: Base demo shell }
   env: []
   capabilities: { openInChat: true, downloadProfile: hosted-base-assistant-ui, agentProfile: hosted-base-assistant-ui }
