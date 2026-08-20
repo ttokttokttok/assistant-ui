@@ -1,6 +1,6 @@
 import type { SelectedTemplateContext } from "@/components/xulux/XuluxApp";
+import { getXuluxCatalog } from "@/lib/catalog/xulux";
 import { getDemoDownloadManifest } from "@/lib/xulux/demo-downloads/manifest";
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
 
 export type XuluxThreadWelcomeSuggestion = {
   label: string;
@@ -287,7 +287,7 @@ const SUPPORT_VERSION_WELCOME: Record<
 };
 
 function findCatalogEntry(template: SelectedTemplateContext) {
-  const { templates } = getXuluxHostedTemplatesCatalog();
+  const { templates } = getXuluxCatalog();
   return (
     templates.find((entry) => entry.id === template.id) ??
     templates.find(

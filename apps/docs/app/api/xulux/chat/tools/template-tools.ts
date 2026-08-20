@@ -1,4 +1,4 @@
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
+import { getXuluxCatalog } from "@/lib/catalog/xulux";
 import type { XuluxTemplate } from "@/components/xulux/templates/types";
 import { getDemoDownloadManifest } from "@/lib/xulux/demo-downloads/manifest";
 import { fetchSandboxResource } from "@/lib/xulux/fetch-sandbox";
@@ -75,7 +75,7 @@ export function createTemplateTools() {
         "Call getTemplateDetails on the chosen template before opening a preview.",
       inputSchema: zodSchema(z.object({})),
       execute: async () => {
-        const { templates } = getXuluxHostedTemplatesCatalog();
+        const { templates } = getXuluxCatalog();
         const seen = new Set<string>();
         const list: Array<{
           id: string;
@@ -133,7 +133,7 @@ export function createTemplateTools() {
         }),
       ),
       execute: async ({ templateId: tid, versionId }) => {
-        const { templates } = getXuluxHostedTemplatesCatalog();
+        const { templates } = getXuluxCatalog();
         const entry =
           (versionId
             ? templates.find(
@@ -242,7 +242,7 @@ export function createTemplateTools() {
         }),
       ),
       execute: async ({ templateId: tid, versionId, config }) => {
-        const { templates } = getXuluxHostedTemplatesCatalog();
+        const { templates } = getXuluxCatalog();
 
         let entry: XuluxTemplate | undefined;
         if (versionId) {
