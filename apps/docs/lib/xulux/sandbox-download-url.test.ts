@@ -107,22 +107,24 @@ it("preserves every legacy hosted download resolution", () => {
   for (const entry of cases) {
     const templateId = entry.templateId ?? entry.id;
     for (const downloadSearch of [undefined, "?session=parity"]) {
-      expect.soft(
-        resolveSandboxDownloadUrl({
-          templates: unified,
-          templateId,
-          versionId: entry.versionId,
-          downloadSearch,
-        })?.href,
-        `${entry.id} ${downloadSearch ?? "default"}`,
-      ).toBe(
-        resolveSandboxDownloadUrl({
-          templates: legacy,
-          templateId,
-          versionId: entry.versionId,
-          downloadSearch,
-        })?.href,
-      );
+      expect
+        .soft(
+          resolveSandboxDownloadUrl({
+            templates: unified,
+            templateId,
+            versionId: entry.versionId,
+            downloadSearch,
+          })?.href,
+          `${entry.id} ${downloadSearch ?? "default"}`,
+        )
+        .toBe(
+          resolveSandboxDownloadUrl({
+            templates: legacy,
+            templateId,
+            versionId: entry.versionId,
+            downloadSearch,
+          })?.href,
+        );
     }
   }
 });
@@ -137,21 +139,23 @@ it("preserves default-version and rejected-id behavior", () => {
     "product-page-assistant",
     "missing-template",
   ]) {
-    expect.soft(
-      resolveSandboxDownloadUrl({
-        templates: unified,
+    expect
+      .soft(
+        resolveSandboxDownloadUrl({
+          templates: unified,
+          templateId,
+          versionId: undefined,
+          downloadSearch: undefined,
+        })?.href,
         templateId,
-        versionId: undefined,
-        downloadSearch: undefined,
-      })?.href,
-      templateId,
-    ).toBe(
-      resolveSandboxDownloadUrl({
-        templates: legacy,
-        templateId,
-        versionId: undefined,
-        downloadSearch: undefined,
-      })?.href,
-    );
+      )
+      .toBe(
+        resolveSandboxDownloadUrl({
+          templates: legacy,
+          templateId,
+          versionId: undefined,
+          downloadSearch: undefined,
+        })?.href,
+      );
   }
 });
