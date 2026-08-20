@@ -1,10 +1,9 @@
-import { examples } from "@/lib/source";
-import { buildCatalog, type Catalog } from "./build";
+import { catalog } from "@/.source/catalog";
 
 export { buildCatalog } from "./build";
 export type { Catalog, CatalogPage } from "./build";
 
-/** Metadata-only runtime catalog; MDX bodies are intentionally not exposed. */
-export function getCatalog(): Catalog {
-  return buildCatalog(examples.getPages());
+/** Static metadata-only catalog; MDX bodies are never imported at runtime. */
+export function getCatalog() {
+  return catalog;
 }
