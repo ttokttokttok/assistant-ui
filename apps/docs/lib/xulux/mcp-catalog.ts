@@ -11,6 +11,7 @@ import {
   fixedDemoListMeta,
   type TemplateToolsMeta,
 } from "@/lib/xulux/template-knowledge";
+import { DEMO_DOWNLOAD_MANIFESTS } from "@/lib/xulux/demo-downloads/manifest";
 
 // ---------------------------------------------------------------------------
 // MCP catalog serialization
@@ -139,6 +140,23 @@ function serializeConfigurableTemplate(
   };
 }
 
+const AGENT_TEMPLATE_ORDER = [
+  ...Object.keys(DEMO_DOWNLOAD_MANIFESTS),
+  "expo-react-native",
+  ...Object.keys(TEMPLATE_LIST_META),
+];
+
+function canonicalConfigurableEntry(entry: XuluxTemplate): XuluxTemplate {
+  const defaultVersion = entry.versions?.[0];
+  if (!defaultVersion) return entry;
+  return {
+    ...entry,
+    versionId: defaultVersion.id,
+    previewUrl: defaultVersion.previewUrl,
+    downloadUrl: defaultVersion.downloadUrl,
+  };
+}
+
 export function buildXuluxMcpCatalogFromTemplateCatalog(
   origin: string,
   catalog: XuluxTemplateCatalog,
@@ -155,12 +173,18 @@ export function buildXuluxMcpCatalogFromTemplateCatalog(
     const result =
       entry.kind === "example"
         ? serializeFixedDemo(normalizedOrigin, entry)
-        : serializeConfigurableTemplate(entry);
+        : serializeConfigurableTemplate(canonicalConfigurableEntry(entry));
     if (!result) continue;
 
     seen.add(tid);
     serialized.push(result);
   }
+
+  serialized.sort(
+    (a, b) =>
+      AGENT_TEMPLATE_ORDER.indexOf(a.templateId) -
+      AGENT_TEMPLATE_ORDER.indexOf(b.templateId),
+  );
 
   return {
     version: XULUX_MCP_CATALOG_VERSION,
