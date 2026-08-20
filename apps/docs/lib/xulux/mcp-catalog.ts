@@ -2,7 +2,7 @@ import type {
   XuluxTemplate,
   XuluxTemplateCatalog,
 } from "@/components/xulux/templates/types";
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
+import { getXuluxCatalog } from "@/lib/catalog/xulux";
 import {
   CONFIG_ROOTS_SCHEMAS,
   RULES,
@@ -197,6 +197,6 @@ export function buildXuluxMcpCatalogFromTemplateCatalog(
 export function buildXuluxMcpCatalog(origin: string): XuluxMcpCatalog {
   return buildXuluxMcpCatalogFromTemplateCatalog(
     origin,
-    getXuluxHostedTemplatesCatalog(),
+    getXuluxCatalog(),
   );
 }

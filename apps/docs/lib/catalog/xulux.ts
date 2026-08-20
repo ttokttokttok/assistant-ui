@@ -3,6 +3,7 @@ import type {
   XuluxTemplateCatalog,
 } from "@/components/xulux/templates/types";
 import type { Catalog } from "./build";
+import { getCatalog } from "./index";
 
 type Item = Catalog["items"][number];
 
@@ -88,4 +89,8 @@ export function projectXuluxCatalog(catalog: Catalog): XuluxTemplateCatalog {
       canStart: item.capabilities.openInChat,
     })),
   };
+}
+
+export function getXuluxCatalog(): XuluxTemplateCatalog {
+  return projectXuluxCatalog(getCatalog());
 }
