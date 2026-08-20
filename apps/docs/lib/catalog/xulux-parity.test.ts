@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getCatalog } from "./index";
 import { projectXuluxCatalog } from "./xulux";
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
-import { INTERNAL_EXAMPLES } from "@/lib/examples";
+import { getXuluxHostedTemplatesCatalog } from "./__fixtures__/legacy-templates-catalog";
+import { INTERNAL_EXAMPLES } from "./__fixtures__/legacy-examples";
 import {
   buildXuluxMcpCatalogFromTemplateCatalog,
 } from "@/lib/xulux/mcp-catalog";

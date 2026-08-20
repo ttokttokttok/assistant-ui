@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { resolveSandboxDownloadUrl } from "./sandbox-download-url";
 import type { XuluxTemplate } from "@/components/xulux/templates/types";
 import { getXuluxCatalog } from "@/lib/catalog/xulux";
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
+import { getXuluxHostedTemplatesCatalog } from "@/lib/catalog/__fixtures__/legacy-templates-catalog";
 
 const template: XuluxTemplate = {
   id: "webpage-assistant-product-docs",

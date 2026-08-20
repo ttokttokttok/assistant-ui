@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { INTERNAL_EXAMPLES } from "@/lib/examples";
+import { INTERNAL_EXAMPLES } from "./__fixtures__/legacy-examples";
 import { getExamplePreview, getExamplesPageItems } from "./examples";
 
 describe("Examples catalog projection", () => {
