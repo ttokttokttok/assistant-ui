@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { getXuluxCatalog } from "@/lib/catalog/xulux";
 import { isAiPlaygroundEnabled } from "@/lib/feature-flags";
 import { fetchSandboxResource } from "@/lib/xulux/fetch-sandbox";
 import { resolveSandboxDownloadUrl } from "@/lib/xulux/sandbox-download-url";
-import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
 
 export const runtime = "nodejs";
 
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
   }
 
   const upstreamUrl = resolveSandboxDownloadUrl({
-    templates: getXuluxHostedTemplatesCatalog().templates,
+    templates: getXuluxCatalog().templates,
     templateId,
     versionId,
     downloadSearch,
