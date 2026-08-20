@@ -61,3 +61,7 @@ export const DEMO_META: DemoMeta[] = [
     githubLink: `${GITHUB_EXAMPLES_BASE}/perplexity.tsx`,
   },
 ];
+
+export function getDemoMeta(slug: string): DemoMeta | undefined {
+  return DEMO_META.find((demo) => demo.slug === slug);
+}

@@ -1,20 +1,68 @@
-import type { ReactNode } from "react";
-import { Artifacts } from "@/components/examples/artifacts";
-import { Base } from "@/components/examples/base";
-import { ChatGPT } from "@/components/examples/chatgpt";
-import { Claude } from "@/components/examples/claude";
-import { Gemini } from "@/components/examples/gemini";
-import { GenUI } from "@/components/examples/genui";
-import { Grok } from "@/components/examples/grok";
-import { ModalChat } from "@/components/examples/modal";
-import { Perplexity } from "@/components/examples/perplexity";
-import { DemoIframe } from "@/components/docs/demo-iframe";
-import { ArtifactsRuntimeProvider } from "@/contexts/ArtifactsRuntimeProvider";
-import { DocsRuntimeProvider } from "@/contexts/DocsRuntimeProvider";
+"use client";
 
-function ThreadPreview({ children }: { children: ReactNode }) {
-  return <DocsRuntimeProvider>{children}</DocsRuntimeProvider>;
+import dynamic from "next/dynamic";
+import type { ComponentType, ReactNode } from "react";
+import { DemoIframe } from "@/components/docs/demo-iframe";
+
+function dynamicThreadPreview(
+  loadPreview: () => Promise<ComponentType>,
+): ComponentType {
+  return dynamic(async () => {
+    const [{ DocsRuntimeProvider }, Preview] = await Promise.all([
+      import("@/contexts/DocsRuntimeProvider"),
+      loadPreview(),
+    ]);
+
+    return function ThreadPreview() {
+      return (
+        <DocsRuntimeProvider>
+          <Preview />
+        </DocsRuntimeProvider>
+      );
+    };
+  });
 }
+
+const ModalPreview = dynamicThreadPreview(() =>
+  import("@/components/examples/modal").then((module) => module.ModalChat),
+);
+const ChatGPTPreview = dynamicThreadPreview(() =>
+  import("@/components/examples/chatgpt").then((module) => module.ChatGPT),
+);
+const ClaudePreview = dynamicThreadPreview(() =>
+  import("@/components/examples/claude").then((module) => module.Claude),
+);
+const GeminiPreview = dynamicThreadPreview(() =>
+  import("@/components/examples/gemini").then((module) => module.Gemini),
+);
+const GrokPreview = dynamicThreadPreview(() =>
+  import("@/components/examples/grok").then((module) => module.Grok),
+);
+const PerplexityPreview = dynamicThreadPreview(() =>
+  import("@/components/examples/perplexity").then(
+    (module) => module.Perplexity,
+  ),
+);
+const BasePreview = dynamicThreadPreview(() =>
+  import("@/components/examples/base").then((module) => module.Base),
+);
+const ArtifactsPreview = dynamic(async () => {
+  const [{ ArtifactsRuntimeProvider }, { Artifacts }] = await Promise.all([
+    import("@/contexts/ArtifactsRuntimeProvider"),
+    import("@/components/examples/artifacts"),
+  ]);
+
+  return function ArtifactsWithRuntime() {
+    return (
+      <ArtifactsRuntimeProvider>
+        <Artifacts />
+      </ArtifactsRuntimeProvider>
+    );
+  };
+});
+const GenerativeUIPreview = dynamic(() =>
+  import("@/components/examples/genui").then((module) => module.GenUI),
+);
 
 export function hasExamplePreview(slug: string): boolean {
   switch (slug) {
@@ -39,11 +87,7 @@ export function hasExamplePreview(slug: string): boolean {
 export function ExamplePreview({ slug }: { slug: string }): ReactNode {
   switch (slug) {
     case "modal":
-      return (
-        <ThreadPreview>
-          <ModalChat />
-        </ThreadPreview>
-      );
+      return <ModalPreview />;
     case "form-demo":
       return (
         <DemoIframe
@@ -53,41 +97,17 @@ export function ExamplePreview({ slug }: { slug: string }): ReactNode {
         />
       );
     case "chatgpt":
-      return (
-        <ThreadPreview>
-          <ChatGPT />
-        </ThreadPreview>
-      );
+      return <ChatGPTPreview />;
     case "claude":
-      return (
-        <ThreadPreview>
-          <Claude />
-        </ThreadPreview>
-      );
+      return <ClaudePreview />;
     case "gemini":
-      return (
-        <ThreadPreview>
-          <Gemini />
-        </ThreadPreview>
-      );
+      return <GeminiPreview />;
     case "grok":
-      return (
-        <ThreadPreview>
-          <Grok />
-        </ThreadPreview>
-      );
+      return <GrokPreview />;
     case "perplexity":
-      return (
-        <ThreadPreview>
-          <Perplexity />
-        </ThreadPreview>
-      );
+      return <PerplexityPreview />;
     case "ai-sdk":
-      return (
-        <ThreadPreview>
-          <Base />
-        </ThreadPreview>
-      );
+      return <BasePreview />;
     case "mem0":
       return (
         <DemoIframe
@@ -105,13 +125,9 @@ export function ExamplePreview({ slug }: { slug: string }): ReactNode {
         />
       );
     case "artifacts":
-      return (
-        <ArtifactsRuntimeProvider>
-          <Artifacts />
-        </ArtifactsRuntimeProvider>
-      );
+      return <ArtifactsPreview />;
     case "generative-ui":
-      return <GenUI />;
+      return <GenerativeUIPreview />;
     default:
       return null;
   }

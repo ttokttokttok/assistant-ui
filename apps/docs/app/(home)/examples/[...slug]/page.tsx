@@ -15,7 +15,7 @@ import {
   getExamplesPageItems,
   getExamplesPageNeighbors,
 } from "@/lib/catalog/examples";
-import { getDemo } from "@/lib/demos";
+import { getDemoMeta } from "@/lib/demos-meta";
 import { examples } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 import { CatalogDetailActions } from "@/components/docs/catalog-detail-actions";
@@ -57,7 +57,7 @@ export default async function ExamplePage(props: {
   if (!catalogItem) notFound();
   const exampleSlug = slug.length === 1 ? slug[0] : undefined;
   const demo = exampleSlug
-    ? getDemo(EXAMPLE_TO_DEMO_SLUG[exampleSlug] ?? exampleSlug)
+    ? getDemoMeta(EXAMPLE_TO_DEMO_SLUG[exampleSlug] ?? exampleSlug)
     : undefined;
   const neighbors = getExamplesPageNeighbors(pageUrl);
   const mdxComponents = getMDXComponents({});
