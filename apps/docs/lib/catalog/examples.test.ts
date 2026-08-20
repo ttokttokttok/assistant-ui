@@ -28,7 +28,7 @@ describe("Examples catalog projection", () => {
     expect(items.filter((item) => matchesExamplesQuery(item, "webhooks")))
       .toHaveLength(1);
     expect(items.filter((item) => matchesExamplesQuery(item, "CHATGPT")))
-      .toHaveLength(1);
+      .toContainEqual(expect.objectContaining({ id: "chatgpt" }));
     expect(items.every((item) => matchesExamplesQuery(item, "   "))).toBe(true);
     expect(items.some((item) => matchesExamplesQuery(item, "not-in-catalog")))
       .toBe(false);
