@@ -1,0 +1,43 @@
+---
+title: Developer API Integration Assistant
+description: Helps developers debug API setup, auth, SDKs, webhooks, and errors.
+catalog:
+  id: webpage-assistant-developer-api
+  kind: template
+  templateId: webpage-assistant
+  versionId: developer-api
+  category:
+    id: docs
+    name: Docs and Knowledge
+    description: Docs, API references, website guidance, search, and examples.
+  tags: [API, Developers, Webhooks]
+  prompt: Spin up an API docs assistant for debugging auth and webhooks.
+  gradient: from-blue-500/40 via-indigo-500/30 to-violet-400/20
+  featured: true
+  preview:
+    status: live
+    url: https://0d9e27d14127c0eeadfc34b424cc7ed0.preview.bl.run/preview?v=developer-api
+  intent:
+    goodFor: [API authentication, Webhook handlers, SDK setup]
+    notFor: [Support ticket triage, CRM workflows]
+    exampleUserRequests:
+      - Build an API docs assistant for a billing API.
+      - Help developers debug authentication and webhook setup.
+  customization:
+    safeFieldsSummary:
+      - Docs shell names, default page, navigation groups, and rendered pages
+      - Assistant names, welcome copy, labels, and suggested prompts
+    supportedRenderers: [sourceResults, pagePreview, codeSnippet, generic]
+    sourceEditFiles:
+      - lib/docs/host-ui.ts
+      - lib/docs/assistant-config.ts
+  tech:
+    framework: Next.js
+    runtime: assistant-ui + AI SDK
+    frontendPattern: Docs assistant
+  env: []
+  capabilities:
+    openInChat: true
+    downloadProfile: hosted-webpage-assistant
+    agentProfile: hosted-webpage-assistant
+---
