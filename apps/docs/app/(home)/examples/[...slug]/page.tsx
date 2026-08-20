@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   ExamplePreview,
   hasExamplePreview,
@@ -15,14 +15,11 @@ import {
   getExamplesPageItems,
   getExamplesPageNeighbors,
 } from "@/lib/catalog/examples";
-import { getDemoMeta } from "@/lib/demos-meta";
 import { examples } from "@/lib/examples-source";
 import { getMDXComponents } from "@/mdx-components";
 import { CatalogDetailActions } from "@/components/docs/catalog-detail-actions";
 import { CatalogPreview } from "@/components/docs/catalog-preview";
 import { CatalogSummary } from "@/components/docs/catalog-summary";
-
-const EXAMPLE_TO_DEMO_SLUG: Record<string, string> = { "ai-sdk": "base" };
 
 export function generateStaticParams() {
   return getExamplesPageItems().map((item) => ({
@@ -56,9 +53,6 @@ export default async function ExamplePage(props: {
   const catalogItem = page.data.catalog;
   if (!catalogItem) notFound();
   const exampleSlug = slug.length === 1 ? slug[0] : undefined;
-  const demo = exampleSlug
-    ? getDemoMeta(EXAMPLE_TO_DEMO_SLUG[exampleSlug] ?? exampleSlug)
-    : undefined;
   const neighbors = getExamplesPageNeighbors(pageUrl);
   const mdxComponents = getMDXComponents({});
   const preview = exampleSlug ? hasExamplePreview(exampleSlug) : false;
@@ -84,15 +78,6 @@ export default async function ExamplePage(props: {
         )}
         <div className="mt-6 flex flex-wrap items-center gap-4 text-[13px]">
           <CatalogDetailActions item={catalogItem} />
-          {demo && (
-            <Link
-              href={`/demos/${demo.slug}`}
-              className="text-foreground hover:text-foreground/70 inline-flex items-center gap-1.5 font-medium transition-colors"
-            >
-              Open demo
-              <ArrowUpRight className="size-3.5" />
-            </Link>
-          )}
           {item.githubLink && (
             <a
               href={item.githubLink}

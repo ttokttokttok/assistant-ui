@@ -17,7 +17,7 @@ export function CatalogDetailActions({ item }: { item: CatalogItem }) {
           render={<Link href={actions.openInChatUrl} />}
         >
           <MessageSquareIcon className="size-3.5" />
-          Open in chat
+          Open in playground
         </Button>
       )}
       {actions.downloadUrl && (
