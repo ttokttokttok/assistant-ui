@@ -65,7 +65,7 @@ const config: NextConfig = {
     cpus: 2,
   },
   transpilePackages: ["@assistant-ui/ui", "shiki"],
-  serverExternalPackages: ["just-bash"],
+  serverExternalPackages: ["@assistant-ui/ai-sdk", "just-bash"],
   skipTrailingSlashRedirect: true,
   outputFileTracingIncludes: {
     "/elements/[slug]": [
