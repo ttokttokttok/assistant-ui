@@ -62,7 +62,7 @@ const config: NextConfig = {
     // Learn previews compile several complete lesson stages into the docs app.
     // Bound build concurrency so Vercel and other constrained builders do not
     // run out of memory while Turbopack compiles those routes in parallel.
-    cpus: 2,
+    cpus: 1,
   },
   transpilePackages: ["@assistant-ui/ui", "shiki"],
   serverExternalPackages: ["@assistant-ui/ai-sdk", "just-bash"],
