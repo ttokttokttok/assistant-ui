@@ -9,17 +9,23 @@ export type ExampleCardItem = {
 };
 
 export function getExamplesPageItems(): ExampleCardItem[] {
-  return getCatalog().items.flatMap((item) => {
-    if (item.kind !== "example" || !item.examplesCard) return [];
-    return [{
-      title: item.examplesCard.title,
-      ...(item.examplesCard.description
-        ? { description: item.examplesCard.description }
-        : {}),
-      image: item.examplesCard.image,
-      link: item.url,
-    }];
-  });
+  return [...getCatalog().items]
+    .sort(
+      (a, b) =>
+        (a.order ?? Number.MAX_SAFE_INTEGER) -
+        (b.order ?? Number.MAX_SAFE_INTEGER),
+    )
+    .flatMap((item) => {
+      if (item.kind !== "example" || !item.examplesCard) return [];
+      return [{
+        title: item.examplesCard.title,
+        ...(item.examplesCard.description
+          ? { description: item.examplesCard.description }
+          : {}),
+        image: item.examplesCard.image,
+        link: item.url,
+      }];
+    });
 }
 
 export function getExamplePreview(slug: string) {
