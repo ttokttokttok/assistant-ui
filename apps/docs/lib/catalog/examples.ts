@@ -39,7 +39,9 @@ export function getExamplesPageItems(): ExampleCardItem[] {
       ...(image ? { image } : {}),
       gradient: item.gradient,
       link: item.url,
-      ...(sourceUrl(item.sourcePath) ? { githubLink: sourceUrl(item.sourcePath) } : {}),
+      ...(sourceUrl(item.sourcePath)
+        ? { githubLink: sourceUrl(item.sourcePath) }
+        : {}),
       searchText: [title, description, item.category.name, ...item.tags]
         .join(" ")
         .toLocaleLowerCase(),

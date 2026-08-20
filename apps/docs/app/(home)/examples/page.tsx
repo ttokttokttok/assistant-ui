@@ -23,10 +23,7 @@ export const metadata: Metadata = {
 };
 
 const CATALOG_EXAMPLES = getExamplesPageItems();
-const OFFICIAL_EXAMPLES = [
-  ...CATALOG_EXAMPLES,
-  ...OFFICIAL_EXTERNAL_EXAMPLES,
-];
+const OFFICIAL_EXAMPLES = [...CATALOG_EXAMPLES, ...OFFICIAL_EXTERNAL_EXAMPLES];
 
 function SectionHeading({
   index,

@@ -29,7 +29,7 @@ export function ExamplesCatalog({ items }: { items: ExampleCardItem[] }) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search examples and templates…"
-          className="border-foreground/10 bg-foreground/[0.025] focus-visible:border-foreground/30 h-10 w-full rounded-xl border py-2 pr-3 pl-10 text-[13px] outline-none transition-colors"
+          className="border-foreground/10 bg-foreground/[0.025] focus-visible:border-foreground/30 h-10 w-full rounded-xl border py-2 pr-3 pl-10 text-[13px] transition-colors outline-none"
         />
       </label>
 
