@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { ExampleCardItem } from "@/lib/catalog/examples";
+import { cn } from "@/lib/utils";
 
 export function ExampleCard({
   title,
   image,
+  gradient,
   description,
   link,
   external = false,
@@ -17,13 +19,23 @@ export function ExampleCard({
       {...(external && { target: "_blank", rel: "noopener noreferrer" })}
     >
       <div className="overflow-hidden">
-        <Image
-          src={image}
-          alt={title}
-          width={600}
-          height={400}
-          className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-        />
+        {image ? (
+          <Image
+            src={image}
+            alt={title}
+            width={600}
+            height={400}
+            className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className={cn(
+              "aspect-video w-full bg-gradient-to-br transition-transform duration-300 group-hover:scale-[1.02]",
+              gradient,
+            )}
+          />
+        )}
       </div>
       <div className="flex flex-col gap-1 p-4">
         <div className="flex items-center justify-between">

@@ -107,6 +107,7 @@ export function XuluxShell({
   onSetSelectedTemplateContext,
   onSetActivePreviewContext,
   onResetSession,
+  initialTemplate,
 }: {
   mode: XuluxMode;
   courseId: string;
@@ -124,6 +125,7 @@ export function XuluxShell({
     context: XuluxActivePreviewContext | null,
   ) => void;
   onResetSession: () => void;
+  initialTemplate: XuluxTemplate | null;
 }) {
   const { askAI } = useAssistantPanel();
   const aui = useAui();
@@ -149,6 +151,7 @@ export function XuluxShell({
   });
   const viewedRef = useRef(false);
   const previewTrackedRef = useRef<string | null>(null);
+  const initialTemplateHandledRef = useRef(false);
   const autoStartRef = useRef(false);
   const startInFlightRef = useRef(false);
   const startRequestRunningRef = useRef(false);
@@ -359,6 +362,12 @@ export function XuluxShell({
     },
     [aui, onSetActivePreviewContext, onSetSelectedTemplateContext],
   );
+
+  useEffect(() => {
+    if (!initialTemplate || initialTemplateHandledRef.current) return;
+    initialTemplateHandledRef.current = true;
+    handleSelectTemplate(initialTemplate);
+  }, [handleSelectTemplate, initialTemplate]);
 
   const handleNewChat = useCallback(() => {
     const nextSessionId = crypto.randomUUID();

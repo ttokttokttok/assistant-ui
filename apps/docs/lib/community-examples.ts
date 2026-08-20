@@ -2,6 +2,7 @@ import type { ExampleCardItem } from "@/lib/catalog/examples";
 
 export const COMMUNITY_EXAMPLES: ExampleCardItem[] = [
   {
+    id: "community-mastra-ui-dojo",
     title: "Mastra UI Dojo",
     image: "/screenshot/examples/mastra-ui-dojo.png",
     description:
@@ -10,6 +11,7 @@ export const COMMUNITY_EXAMPLES: ExampleCardItem[] = [
     external: true,
   },
   {
+    id: "community-open-canvas",
     title: "Open Canvas",
     image: "/screenshot/open-canvas.png",
     description: "OSS implementation of ChatGPT's Canvas.",
@@ -17,6 +19,7 @@ export const COMMUNITY_EXAMPLES: ExampleCardItem[] = [
     external: true,
   },
   {
+    id: "community-fastapi-langgraph",
     title: "FastAPI + LangGraph",
     image: "/screenshot/examples/fastapi-langgraph.png",
     description:

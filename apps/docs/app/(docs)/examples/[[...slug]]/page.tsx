@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { getDemo } from "@/lib/demos";
 import { CatalogSummary } from "@/components/docs/catalog-summary";
 import { CatalogPreview } from "@/components/docs/catalog-preview";
+import { CatalogDetailActions } from "@/components/docs/catalog-detail-actions";
 
 // The AI SDK example renders the Base demo component.
 const EXAMPLE_TO_DEMO_SLUG: Record<string, string> = { "ai-sdk": "base" };
@@ -73,6 +74,9 @@ export default async function Page(props: {
                 {page.data.title}
               </h1>
               <div className="flex items-center gap-2">
+                {page.data.catalog && (
+                  <CatalogDetailActions item={page.data.catalog} />
+                )}
                 {demo && (
                   <Button
                     variant="outline"

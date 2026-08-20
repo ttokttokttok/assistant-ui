@@ -46,6 +46,11 @@ import {
 } from "@/lib/playground-url-state";
 import { isAiPlaygroundEnabled } from "@/lib/feature-flags";
 import { PlaygroundRuntimeProvider } from "@/contexts/PlaygroundRuntimeProvider";
+import type { XuluxTemplate } from "@/components/xulux/templates/types";
+import {
+  readXuluxCatalogDeepLink,
+  resolveXuluxCatalogDeepLink,
+} from "@/lib/xulux/catalog-deep-link";
 
 const XuluxApp = isAiPlaygroundEnabled
   ? dynamic(() =>
@@ -394,6 +399,35 @@ export default function PlaygroundPage() {
     agent: isAiPlaygroundEnabled,
     builder: !isAiPlaygroundEnabled,
   });
+  const [catalogDeepLink, setCatalogDeepLink] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "ready"; template: XuluxTemplate }
+    | { status: "error" }
+  >({ status: "idle" });
+
+  useEffect(() => {
+    const link = readXuluxCatalogDeepLink(
+      new URLSearchParams(window.location.search),
+    );
+    if (!link) return;
+
+    const controller = new AbortController();
+    setCatalogDeepLink({ status: "loading" });
+    void fetch("/api/xulux/templates", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Catalog unavailable");
+        const catalog = await response.json();
+        const template = resolveXuluxCatalogDeepLink(catalog, link);
+        setCatalogDeepLink(template ? { status: "ready", template } : { status: "error" });
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setCatalogDeepLink({ status: "error" });
+      });
+
+    return () => controller.abort();
+  }, []);
 
   const handleModeChange = useCallback((nextMode: "agent" | "builder") => {
     setMode(nextMode);
@@ -445,7 +479,26 @@ export default function PlaygroundPage() {
             )}
             aria-hidden={mode !== "agent"}
           >
-            <XuluxApp />
+            {catalogDeepLink.status === "loading" ? (
+              <p role="status" className="text-muted-foreground m-auto text-sm">
+                Opening template…
+              </p>
+            ) : catalogDeepLink.status === "error" ? (
+              <div role="alert" className="m-auto max-w-sm px-6 text-center">
+                <p className="font-medium">This template link is not available.</p>
+                <p className="text-muted-foreground mt-2 text-sm">
+                  Return to Examples and choose an item that supports Open in chat.
+                </p>
+              </div>
+            ) : (
+              <XuluxApp
+                initialTemplate={
+                  catalogDeepLink.status === "ready"
+                    ? catalogDeepLink.template
+                    : null
+                }
+              />
+            )}
           </div>
         )}
         {visitedModes.builder && (

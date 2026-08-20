@@ -59,11 +59,13 @@ export function XuluxApp({
   courseId = DEFAULT_LEARN_COURSE_ID,
   autoStart = false,
   autoStartSource = "suggestion",
+  initialTemplate = null,
 }: {
   mode?: XuluxMode;
   courseId?: string;
   autoStart?: boolean;
   autoStartSource?: LearnAutoStartSource;
+  initialTemplate?: XuluxTemplate | null;
 }) {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const [learnProgress, setLearnProgress] = useState<LearnProgress>(() =>
@@ -115,6 +117,7 @@ export function XuluxApp({
           onSetSelectedTemplateContext={setSelectedTemplateContext}
           onSetActivePreviewContext={setActivePreviewContext}
           onResetSession={resetSession}
+          initialTemplate={initialTemplate}
         />
       </AssistantPanelProvider>
     </XuluxRuntimeProvider>

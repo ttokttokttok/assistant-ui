@@ -1,31 +1,50 @@
 import { getCatalog } from "./index";
 
 export type ExampleCardItem = {
+  id: string;
   title: string;
   description?: string | undefined;
-  image: string;
+  image?: string | undefined;
+  gradient?: string | undefined;
   link: string;
   external?: boolean | undefined;
+  searchText?: string | undefined;
 };
 
 export function getExamplesPageItems(): ExampleCardItem[] {
-  return [...getCatalog().items]
-    .sort(
-      (a, b) =>
-        (a.order ?? Number.MAX_SAFE_INTEGER) -
-        (b.order ?? Number.MAX_SAFE_INTEGER),
-    )
-    .flatMap((item) => {
-      if (item.kind !== "example" || !item.examplesCard) return [];
-      return [{
-        title: item.examplesCard.title,
-        ...(item.examplesCard.description
-          ? { description: item.examplesCard.description }
-          : {}),
-        image: item.examplesCard.image,
-        link: item.url,
-      }];
-    });
+  const items = getCatalog().items;
+  const byOrder = (a: (typeof items)[number], b: (typeof items)[number]) =>
+    (a.order ?? Number.MAX_SAFE_INTEGER) -
+    (b.order ?? Number.MAX_SAFE_INTEGER);
+
+  return [
+    ...items.filter((item) => item.kind === "example").sort(byOrder),
+    ...items.filter((item) => item.kind === "template").sort(byOrder),
+  ].map((item) => {
+    const title = item.examplesCard?.title ?? item.title;
+    const description = item.examplesCard?.description ?? item.description;
+    const image = item.examplesCard?.image ?? item.image;
+
+    return {
+      id: item.id,
+      title,
+      description,
+      ...(image ? { image } : {}),
+      gradient: item.gradient,
+      link: item.url,
+      searchText: [
+        title,
+        description,
+        item.category.name,
+        ...item.tags,
+      ].join(" ").toLocaleLowerCase(),
+    };
+  });
+}
+
+export function matchesExamplesQuery(item: ExampleCardItem, query: string) {
+  const normalized = query.trim().toLocaleLowerCase();
+  return normalized.length === 0 || item.searchText?.includes(normalized) === true;
 }
 
 export function getExamplePreview(slug: string) {
