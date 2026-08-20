@@ -34,6 +34,11 @@ export const catalogItemSchema = z.object({
   prompt: z.string().min(1),
   gradient: z.string().min(1),
   image: z.string().min(1).optional(),
+  examplesCard: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1).optional(),
+    image: z.string().min(1),
+  }).optional(),
   featured: z.boolean().optional(),
   preview: z.object({
     status: z.enum(["live", "stale", "missing"]),
