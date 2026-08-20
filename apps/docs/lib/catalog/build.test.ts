@@ -42,4 +42,21 @@ describe("buildCatalog", () => {
       "Category chat has conflicting names",
     );
   });
+
+  it("keeps the catalog page canonical when related docs exist", () => {
+    const catalog = buildCatalog([
+      page({
+        data: {
+          title: "Test Item",
+          description: "A test item.",
+          catalog: { ...item, docsUrl: "/docs/test-item" },
+        },
+      }),
+    ]);
+
+    expect(catalog.items[0]).toMatchObject({
+      url: "/examples/test-item",
+      docsUrl: "/docs/test-item",
+    });
+  });
 });

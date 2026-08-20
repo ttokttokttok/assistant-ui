@@ -5,6 +5,7 @@ export type ExampleCardItem = {
   title: string;
   description?: string | undefined;
   image?: string | undefined;
+  previewUrl?: string | undefined;
   gradient?: string | undefined;
   link: string;
   external?: boolean | undefined;
@@ -37,6 +38,9 @@ export function getExamplesPageItems(): ExampleCardItem[] {
       title,
       description,
       ...(image ? { image } : {}),
+      ...(item.preview.status === "live" && item.preview.url
+        ? { previewUrl: item.preview.url }
+        : {}),
       gradient: item.gradient,
       link: item.url,
       ...(sourceUrl(item.sourcePath)

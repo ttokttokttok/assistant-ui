@@ -1,12 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { ExampleCardItem } from "@/lib/catalog/examples";
-import { cn } from "@/lib/utils";
+import { Thumbnail } from "@/components/xulux/landing/Thumbnail";
 
 export function ExampleCard({
   title,
   image,
+  previewUrl,
   gradient,
   description,
   link,
@@ -19,22 +19,13 @@ export function ExampleCard({
       className="group flex flex-col"
       {...(external && { target: "_blank", rel: "noopener noreferrer" })}
     >
-      <div className="border-foreground/10 bg-foreground/[0.025] dark:bg-foreground/[0.04] relative aspect-[16/10] overflow-hidden rounded-[20px] border">
-        {image ? (
-          <Image
-            src={image}
-            alt={title}
-            fill
-            sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
-            className="object-cover object-top"
-          />
-        ) : (
-          <div
-            aria-hidden="true"
-            className={cn("absolute inset-0 bg-gradient-to-br", gradient)}
-          />
-        )}
-      </div>
+      <Thumbnail
+        gradient={gradient ?? ""}
+        label={title}
+        src={image}
+        previewUrl={previewUrl}
+        className="border-foreground/10 bg-foreground/[0.025] dark:bg-foreground/[0.04] aspect-[16/10] rounded-[20px] border"
+      />
       <div className="mt-4 flex items-baseline gap-2.5">
         <span className="text-foreground/30 font-mono text-[11px] tracking-tight tabular-nums">
           {String(index).padStart(2, "0")}

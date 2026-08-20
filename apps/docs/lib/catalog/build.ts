@@ -48,7 +48,9 @@ export function buildCatalog(pages: readonly CatalogPage[]): Catalog {
         ...item,
         title: page.data.title,
         description: page.data.description,
-        url: item.docsUrl ?? page.url,
+        // The catalog page is the canonical destination for Examples and
+        // agents. docsUrl remains separate related documentation metadata.
+        url: page.url,
       },
     ];
   });
