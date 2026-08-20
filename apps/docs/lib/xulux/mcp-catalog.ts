@@ -1,4 +1,7 @@
-import type { XuluxTemplate } from "@/components/xulux/templates/types";
+import type {
+  XuluxTemplate,
+  XuluxTemplateCatalog,
+} from "@/components/xulux/templates/types";
 import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
 import {
   CONFIG_ROOTS_SCHEMAS,
@@ -136,9 +139,12 @@ function serializeConfigurableTemplate(
   };
 }
 
-export function buildXuluxMcpCatalog(origin: string): XuluxMcpCatalog {
+export function buildXuluxMcpCatalogFromTemplateCatalog(
+  origin: string,
+  catalog: XuluxTemplateCatalog,
+): XuluxMcpCatalog {
   const normalizedOrigin = origin.replace(/\/+$/, "");
-  const { templates } = getXuluxHostedTemplatesCatalog();
+  const { templates } = catalog;
   const seen = new Set<string>();
   const serialized: XuluxMcpCatalogTemplate[] = [];
 
@@ -162,4 +168,11 @@ export function buildXuluxMcpCatalog(origin: string): XuluxMcpCatalog {
     docsOrigin: normalizedOrigin,
     templates: serialized,
   };
+}
+
+export function buildXuluxMcpCatalog(origin: string): XuluxMcpCatalog {
+  return buildXuluxMcpCatalogFromTemplateCatalog(
+    origin,
+    getXuluxHostedTemplatesCatalog(),
+  );
 }
