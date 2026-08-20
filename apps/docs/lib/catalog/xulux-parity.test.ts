@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { getCatalog } from "./index";
 import { projectXuluxCatalog } from "./xulux";
 import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
-import { getXuluxExamplesCatalog } from "@/lib/xulux/examples-catalog";
 import { INTERNAL_EXAMPLES } from "@/lib/examples";
 import {
   buildXuluxMcpCatalog,
@@ -51,7 +50,7 @@ describe("unified catalog hosted-template parity", () => {
     }
 
     expect(catalog.items).toHaveLength(25);
-    expect(getXuluxExamplesCatalog().templates).toHaveLength(13);
+    expect(INTERNAL_EXAMPLES.filter((item) => !item.external)).toHaveLength(13);
   });
 
   it("produces the same complete MCP/agent catalog from getCatalog", () => {
