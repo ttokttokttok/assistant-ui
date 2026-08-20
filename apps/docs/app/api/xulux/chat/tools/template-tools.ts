@@ -48,6 +48,42 @@ function isFixedDemo(entry: XuluxTemplate): boolean {
   return entry.kind === "example";
 }
 
+export function buildTemplateList(templates: XuluxTemplate[]) {
+  const seen = new Set<string>();
+  const list: Array<{
+    id: string;
+    name: string;
+    summary: string;
+    assistantPlacement: string;
+    features: string[];
+    customizable: string[];
+    versions: Array<{ id: string; name: string; description: string }>;
+  }> = [];
+
+  for (const t of templates) {
+    const tid = templateId(t);
+    if (seen.has(tid)) continue;
+    seen.add(tid);
+    const meta = TEMPLATE_LIST_META[tid] ?? fixedDemoListMeta(t);
+    if (!meta) continue;
+    list.push({
+      id: tid,
+      name: meta.name,
+      summary: meta.summary,
+      assistantPlacement: meta.assistantPlacement,
+      features: meta.features,
+      customizable: meta.customizable,
+      versions: (t.versions ?? []).map((v) => ({
+        id: v.id,
+        name: v.title,
+        description: v.description,
+      })),
+    });
+  }
+
+  return { templates: list };
+}
+
 async function fetchTemplateContract(entry: XuluxTemplate, versionId?: string) {
   if (!entry.sandboxBaseUrl) return null;
   try {
@@ -76,39 +112,7 @@ export function createTemplateTools() {
       inputSchema: zodSchema(z.object({})),
       execute: async () => {
         const { templates } = getXuluxCatalog();
-        const seen = new Set<string>();
-        const list: Array<{
-          id: string;
-          name: string;
-          summary: string;
-          assistantPlacement: string;
-          features: string[];
-          customizable: string[];
-          versions: Array<{ id: string; name: string; description: string }>;
-        }> = [];
-
-        for (const t of templates) {
-          const tid = templateId(t);
-          if (seen.has(tid)) continue;
-          seen.add(tid);
-          const meta = TEMPLATE_LIST_META[tid] ?? fixedDemoListMeta(t);
-          if (!meta) continue;
-          list.push({
-            id: tid,
-            name: meta.name,
-            summary: meta.summary,
-            assistantPlacement: meta.assistantPlacement,
-            features: meta.features,
-            customizable: meta.customizable,
-            versions: (t.versions ?? []).map((v) => ({
-              id: v.id,
-              name: v.title,
-              description: v.description,
-            })),
-          });
-        }
-
-        return { templates: list };
+        return buildTemplateList(templates);
       },
     }),
 
