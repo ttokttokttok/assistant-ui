@@ -16,7 +16,7 @@ import {
   getExamplesPageNeighbors,
 } from "@/lib/catalog/examples";
 import { examples } from "@/lib/examples-source";
-import { getMDXComponents } from "@/mdx-components";
+import { getExamplesMDXComponents } from "@/examples-mdx-components";
 import { CatalogDetailActions } from "@/components/docs/catalog-detail-actions";
 import { CatalogPreview } from "@/components/docs/catalog-preview";
 import { CatalogSummary } from "@/components/docs/catalog-summary";
@@ -54,7 +54,7 @@ export default async function ExamplePage(props: {
   if (!catalogItem) notFound();
   const exampleSlug = slug.length === 1 ? slug[0] : undefined;
   const neighbors = getExamplesPageNeighbors(pageUrl);
-  const mdxComponents = getMDXComponents({});
+  const mdxComponents = getExamplesMDXComponents();
   const preview = exampleSlug ? hasExamplePreview(exampleSlug) : false;
 
   return (
