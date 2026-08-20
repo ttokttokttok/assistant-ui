@@ -4,7 +4,10 @@ description: Production-ready examples of AI chat in React — ChatGPT clones, c
 ---
 
 import { ExampleCard } from "@/components/docs/example-card";
-import { INTERNAL_EXAMPLES, COMMUNITY_EXAMPLES } from "@/lib/examples";
+import { getExamplesPageItems } from "@/lib/catalog/examples";
+import { COMMUNITY_EXAMPLES } from "@/lib/community-examples";
+
+export const EXAMPLES = getExamplesPageItems();
 
 <header className="mt-12 mb-16 text-center md:mt-20">
 <h1 className="mb-4 font-medium text-4xl">Examples</h1>
@@ -15,7 +18,7 @@ import { INTERNAL_EXAMPLES, COMMUNITY_EXAMPLES } from "@/lib/examples";
 </header>
 
 <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-  {INTERNAL_EXAMPLES.map((item) => (
+  {EXAMPLES.map((item) => (
     <ExampleCard key={item.title} {...item} />
   ))}
 </div>

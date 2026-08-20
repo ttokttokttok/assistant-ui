@@ -16,7 +16,6 @@ type PreviewData = {
   title: string;
   description?: string | undefined;
   screenshotUrl: string;
-  hasComponentPreview: boolean;
 };
 
 export function ExamplePreview({ preview }: { preview: PreviewData }) {

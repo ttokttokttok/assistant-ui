@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { ExampleItem } from "@/lib/examples";
+import type { ExampleCardItem } from "@/lib/catalog/examples";
 
 export function ExampleCard({
   title,
@@ -9,7 +9,7 @@ export function ExampleCard({
   description,
   link,
   external = false,
-}: ExampleItem) {
+}: ExampleCardItem) {
   return (
     <Link
       href={link}
