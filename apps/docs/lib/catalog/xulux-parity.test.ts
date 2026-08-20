@@ -4,7 +4,6 @@ import { projectXuluxCatalog } from "./xulux";
 import { getXuluxHostedTemplatesCatalog } from "@/lib/xulux/templates-catalog";
 import { INTERNAL_EXAMPLES } from "@/lib/examples";
 import {
-  buildXuluxMcpCatalog,
   buildXuluxMcpCatalogFromTemplateCatalog,
 } from "@/lib/xulux/mcp-catalog";
 
@@ -16,6 +15,12 @@ function withoutGeneratedAt<T extends { generatedAt: string }>(value: T) {
 }
 
 describe("unified catalog hosted-template parity", () => {
+  it("preserves the complete browser catalog payload", () => {
+    expect(projectXuluxCatalog(getCatalog())).toEqual(
+      getXuluxHostedTemplatesCatalog(),
+    );
+  });
+
   it("preserves every existing hosted catalog record", () => {
     const legacy = getXuluxHostedTemplatesCatalog();
     const unified = projectXuluxCatalog(getCatalog());
@@ -54,7 +59,10 @@ describe("unified catalog hosted-template parity", () => {
   });
 
   it("produces the same complete MCP/agent catalog from getCatalog", () => {
-    const legacy = buildXuluxMcpCatalog(ORIGIN);
+    const legacy = buildXuluxMcpCatalogFromTemplateCatalog(
+      ORIGIN,
+      getXuluxHostedTemplatesCatalog(),
+    );
     const unified = buildXuluxMcpCatalogFromTemplateCatalog(
       ORIGIN,
       projectXuluxCatalog(getCatalog()),

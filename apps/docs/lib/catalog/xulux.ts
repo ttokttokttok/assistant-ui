@@ -52,8 +52,12 @@ function versionsFor(item: Item, items: readonly Item[]) {
 }
 
 export function projectXuluxCatalog(catalog: Catalog): XuluxTemplateCatalog {
+  const categoryIds = new Set(catalog.items.map((item) => item.category.id));
+
   return {
-    categories: catalog.categories,
+    categories: catalog.categories.filter((category) =>
+      categoryIds.has(category.id),
+    ),
     templates: catalog.items.map<XuluxTemplate>((item) => ({
       id: item.id,
       ...(item.templateId ? { templateId: item.templateId } : {}),
