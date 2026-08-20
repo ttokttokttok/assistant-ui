@@ -1,0 +1,43 @@
+---
+title: Product Docs Assistant
+description: Answers product documentation questions beside a SaaS docs article.
+catalog:
+  id: webpage-assistant-product-docs
+  kind: template
+  templateId: webpage-assistant
+  versionId: product-docs
+  category:
+    id: docs
+    name: Docs and Knowledge
+    description: Docs, API references, website guidance, search, and examples.
+  tags: [Docs, Product, Guides]
+  prompt: Spin up a product docs assistant for onboarding and release notes.
+  gradient: from-sky-500/40 via-cyan-500/30 to-emerald-400/20
+  featured: true
+  preview:
+    status: live
+    url: https://0d9e27d14127c0eeadfc34b424cc7ed0.preview.bl.run/preview?v=product-docs
+  intent:
+    goodFor: [Product guides, Onboarding docs, Release notes]
+    notFor: [Support ticket triage, CRM workflows]
+    exampleUserRequests:
+      - Build me an API docs assistant for a billing API.
+      - Create a website copilot that explains the current page.
+  customization:
+    safeFieldsSummary:
+      - Docs shell names, default page, navigation groups, and rendered pages
+      - Assistant names, welcome copy, labels, and suggested prompts
+    supportedRenderers: [sourceResults, pagePreview, codeSnippet, generic]
+    sourceEditFiles:
+      - lib/docs/host-ui.ts
+      - lib/docs/assistant-config.ts
+  tech:
+    framework: Next.js
+    runtime: assistant-ui + AI SDK
+    frontendPattern: Docs assistant
+  env: []
+  capabilities:
+    openInChat: true
+    downloadProfile: hosted-webpage-assistant
+    agentProfile: hosted-webpage-assistant
+---

@@ -13,6 +13,7 @@ import Link from "next/link";
 import { ArrowUpRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDemo } from "@/lib/demos";
+import { CatalogSummary } from "@/components/docs/catalog-summary";
 
 // The AI SDK example renders the Base demo component.
 const EXAMPLE_TO_DEMO_SLUG: Record<string, string> = { "ai-sdk": "base" };
@@ -101,6 +102,7 @@ export default async function Page(props: {
         <DocsRuntimeProvider>
           <page.data.body components={mdxComponents} />
         </DocsRuntimeProvider>
+        {page.data.catalog && <CatalogSummary item={page.data.catalog} />}
         {!isIndex && <DocsFooter previous={footerPrevious} next={footerNext} />}
       </DocsBody>
     </DocsPage>
