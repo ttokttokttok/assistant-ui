@@ -11,6 +11,7 @@ import { z } from "zod";
 import lastModified from "fumadocs-mdx/plugins/last-modified";
 import type { ShikiTransformer } from "shiki";
 import { remarkMermaid } from "./lib/remark-mermaid";
+import { catalogItemSchema } from "./lib/catalog/schema";
 
 function transformerLineNumbers(): ShikiTransformer {
   return {
@@ -71,7 +72,9 @@ export const tapDocs = defineDocs({
 export const examples = defineCollections({
   type: "doc",
   dir: "content/examples",
-  schema: frontmatterSchema,
+  schema: frontmatterSchema.extend({
+    catalog: catalogItemSchema.optional(),
+  }),
   postprocess: {
     includeProcessedMarkdown: true,
   },
