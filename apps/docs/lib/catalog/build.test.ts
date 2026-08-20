@@ -10,7 +10,11 @@ const item = catalogItemSchema.parse({
   prompt: "Open the example.",
   gradient: "from-blue-500",
   preview: { status: "missing" },
-  tech: { framework: "React", runtime: "assistant-ui", frontendPattern: "Chat" },
+  tech: {
+    framework: "React",
+    runtime: "assistant-ui",
+    frontendPattern: "Chat",
+  },
 });
 
 const page = (overrides: Partial<CatalogPage> = {}): CatalogPage => ({
@@ -26,21 +30,33 @@ describe("buildCatalog", () => {
       { url: "/examples/docs-only", data: { title: "Docs only" } },
     ]);
     expect(catalog.items).toHaveLength(1);
-    expect(catalog.items[0]).toMatchObject({ id: "test-item", url: "/examples/test-item" });
+    expect(catalog.items[0]).toMatchObject({
+      id: "test-item",
+      url: "/examples/test-item",
+    });
     expect(catalog.items[0]).not.toHaveProperty("body");
   });
 
   it("rejects duplicate item IDs", () => {
-    expect(() => buildCatalog([page(), page({ url: "/examples/duplicate" })])).toThrow(
-      "Duplicate catalog item id: test-item",
-    );
+    expect(() =>
+      buildCatalog([page(), page({ url: "/examples/duplicate" })]),
+    ).toThrow("Duplicate catalog item id: test-item");
   });
 
   it("rejects conflicting category names", () => {
-    const conflicting = { ...item, id: "other", category: { id: "chat", name: "Chats" } };
-    expect(() => buildCatalog([page(), page({ data: { title: "Other", description: "Other.", catalog: conflicting } })])).toThrow(
-      "Category chat has conflicting names",
-    );
+    const conflicting = {
+      ...item,
+      id: "other",
+      category: { id: "chat", name: "Chats" },
+    };
+    expect(() =>
+      buildCatalog([
+        page(),
+        page({
+          data: { title: "Other", description: "Other.", catalog: conflicting },
+        }),
+      ]),
+    ).toThrow("Category chat has conflicting names");
   });
 
   it("keeps the catalog page canonical when related docs exist", () => {
