@@ -5,11 +5,11 @@ import { toFumadocsSource } from "fumadocs-mdx/runtime/server";
 import {
   docs,
   tapDocs as tapDocsCollection,
-  examples as examplePages,
   standalone as standalonePages,
   blog as blogPosts,
   careers as careersCollection,
 } from "fumadocs-mdx:collections/server";
+export { examples, type ExamplePage } from "./examples-source";
 
 /**
  * Propagates `platforms` from meta.json / page frontmatter onto the page tree
@@ -68,13 +68,6 @@ export function getTapDocsPage(slugs: string[] | undefined) {
 export function getTapDocsPages() {
   return tapDocs.getPages().filter((page) => page.slugs.length > 0);
 }
-
-export const examples = loader({
-  baseUrl: "/examples",
-  source: toFumadocsSource(examplePages, []),
-});
-
-export type ExamplePage = InferPageType<typeof examples>;
 
 export const standalone = loader({
   baseUrl: "/standalone",

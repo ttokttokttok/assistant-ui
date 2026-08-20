@@ -16,7 +16,7 @@ import {
   getExamplesPageNeighbors,
 } from "@/lib/catalog/examples";
 import { getDemoMeta } from "@/lib/demos-meta";
-import { examples } from "@/lib/source";
+import { examples } from "@/lib/examples-source";
 import { getMDXComponents } from "@/mdx-components";
 import { CatalogDetailActions } from "@/components/docs/catalog-detail-actions";
 import { CatalogPreview } from "@/components/docs/catalog-preview";
