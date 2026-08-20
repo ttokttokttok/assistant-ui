@@ -9,7 +9,7 @@ describe("unified catalog hosted-template parity", () => {
     const unified = projectXuluxCatalog(getCatalog());
 
     for (const expected of legacy.templates) {
-      expect(
+      expect.soft(
         unified.templates.find((item) => item.id === expected.id),
         expected.id,
       ).toEqual(expected);
