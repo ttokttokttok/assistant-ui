@@ -1,6 +1,7 @@
 import { getXuluxCatalog } from "@/lib/catalog/xulux";
 import type { XuluxTemplate } from "@/components/xulux/templates/types";
 import { getDemoDownloadManifest } from "@/lib/xulux/demo-downloads/manifest";
+import { compareAgentTemplateIds } from "@/lib/xulux/agent-template-order";
 import { fetchSandboxResource } from "@/lib/xulux/fetch-sandbox";
 import {
   CONFIG_ROOTS_SCHEMAS,
@@ -81,6 +82,7 @@ export function buildTemplateList(templates: XuluxTemplate[]) {
     });
   }
 
+  list.sort((a, b) => compareAgentTemplateIds(a.id, b.id));
   return { templates: list };
 }
 

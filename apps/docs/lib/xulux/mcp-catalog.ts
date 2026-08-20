@@ -3,6 +3,7 @@ import type {
   XuluxTemplateCatalog,
 } from "@/components/xulux/templates/types";
 import { getXuluxCatalog } from "@/lib/catalog/xulux";
+import { compareAgentTemplateIds } from "@/lib/xulux/agent-template-order";
 import {
   CONFIG_ROOTS_SCHEMAS,
   RULES,
@@ -11,7 +12,6 @@ import {
   fixedDemoListMeta,
   type TemplateToolsMeta,
 } from "@/lib/xulux/template-knowledge";
-import { DEMO_DOWNLOAD_MANIFESTS } from "@/lib/xulux/demo-downloads/manifest";
 
 // ---------------------------------------------------------------------------
 // MCP catalog serialization
@@ -140,12 +140,6 @@ function serializeConfigurableTemplate(
   };
 }
 
-const AGENT_TEMPLATE_ORDER = [
-  ...Object.keys(DEMO_DOWNLOAD_MANIFESTS),
-  "expo-react-native",
-  ...Object.keys(TEMPLATE_LIST_META),
-];
-
 function canonicalConfigurableEntry(entry: XuluxTemplate): XuluxTemplate {
   const defaultVersion = entry.versions?.[0];
   if (!defaultVersion) return entry;
@@ -180,10 +174,8 @@ export function buildXuluxMcpCatalogFromTemplateCatalog(
     serialized.push(result);
   }
 
-  serialized.sort(
-    (a, b) =>
-      AGENT_TEMPLATE_ORDER.indexOf(a.templateId) -
-      AGENT_TEMPLATE_ORDER.indexOf(b.templateId),
+  serialized.sort((a, b) =>
+    compareAgentTemplateIds(a.templateId, b.templateId),
   );
 
   return {
