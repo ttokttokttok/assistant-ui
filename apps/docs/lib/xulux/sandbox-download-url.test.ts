@@ -88,6 +88,17 @@ it("rejects non-sandbox catalog hosts", () => {
   expect(url).toBeNull();
 });
 
+it("rejects an unknown version instead of falling back to another version", () => {
+  const url = resolveSandboxDownloadUrl({
+    templates: [template],
+    templateId: "webpage-assistant",
+    versionId: "not-real",
+    downloadSearch: undefined,
+  });
+
+  expect(url).toBeNull();
+});
+
 it("preserves every legacy hosted download resolution", () => {
   const legacy = getXuluxHostedTemplatesCatalog().templates;
   const unified = getXuluxCatalog().templates;

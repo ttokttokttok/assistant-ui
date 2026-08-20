@@ -22,11 +22,10 @@ function findTemplate(
   versionId: string | undefined,
 ): XuluxTemplate | undefined {
   if (versionId) {
-    const version = templates.find(
+    return templates.find(
       (template) =>
         getTemplateId(template) === id && template.versionId === versionId,
     );
-    if (version) return version;
   }
 
   return templates.find((template) => getTemplateId(template) === id);
