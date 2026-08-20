@@ -27,6 +27,7 @@ function downloadUrl(item: Item) {
 }
 
 function docsUrl(item: Item) {
+  if (item.docsUrl) return item.docsUrl;
   const profile = item.capabilities.downloadProfile;
   return profile?.startsWith("demo-")
     ? `/demos/${profile.slice("demo-".length)}`
